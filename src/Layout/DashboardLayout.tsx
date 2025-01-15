@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import logo from "../assets/resume-icon.jpg";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, X, Menu } from "lucide-react";
@@ -24,14 +24,18 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div id="toggle" className="h-screen w-screen dark:bg-gray-900 lg:overflow-hidden">
+    <div id="toggle" className="h-screen w-screen dark:bg-gray-900">
       <div
         className={`flex justify-between items-center h-14 bg-gray-100 dark:bg-black px-6 py-2.5 fixed left-0 top-0 w-screen text-black`}
       >
         <img src={logo} className="h-9 cursor-pointer" />
         <div className="hidden md:flex md:gap-4 md:items-center md:text-sm mr-4 cursor-pointer text-black dark:text-white">
-          <h1 className="hover:text-blue-700">Home</h1>
-          <h1 className="hover:text-blue-700">About</h1>
+          <Link to="/" className="hover:text-blue-700">
+            Home
+          </Link>
+          <Link to="about" className="hover:text-blue-700">
+            About
+          </Link>
           {!darkMode ? (
             <Moon onClick={toggleDarkMode} className={`${buttonStyle}`} />
           ) : (
@@ -52,17 +56,23 @@ export const DashboardLayout = () => {
               </Button>
             </PopoverTrigger>
             {isOpen && (
-             <PopoverContent className="md:hidden w-80 p-2 bg-gray-100 dark:bg-gray-900 dark:text-white">
-             <div className="dark:bg-gray-900 dark:text-white">
-               <h1 className="hover:text-blue-700 p-2">Home</h1>
-               <h1 className="hover:text-blue-700 p-2">About</h1>
-             </div>
-           </PopoverContent>           
+              <PopoverContent className="md:hidden w-80 p-2 bg-gray-100 dark:bg-gray-900 dark:text-white">
+                <div className="dark:bg-gray-900 dark:text-white">
+                  <Link to="/" className="hover:text-blue-700 p-2">
+                    Home
+                  </Link>
+                  <Link to="about" className="hover:text-blue-700 p-2">
+                    About
+                  </Link>
+                </div>
+              </PopoverContent>
             )}
           </Popover>
         </div>
       </div>
-      <Outlet />
+      <div className="mt-14">
+        <Outlet />
+      </div>
     </div>
   );
 };

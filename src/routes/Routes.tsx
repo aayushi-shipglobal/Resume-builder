@@ -1,4 +1,5 @@
 import { DashboardLayout } from "@/Layout/DashboardLayout";
+import About from "@/pages/About";
 import Home from "@/pages/Home";
 
 export default function Routes() {
@@ -9,6 +10,10 @@ export default function Routes() {
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "about",
+        element: <About />,
       },
     ],
   };

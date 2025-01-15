@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       {/* main-section */}
-      <div className="mt-14 grid lg:space-x-16 lg:grid-cols-2 px-10 py-4 md:py-20 md:px-24 lg:px-28 lg:pt-8 dark:bg-gray-900 lg:h-screen">
+      <div className="grid lg:space-x-16 lg:grid-cols-2 px-10 py-4 md:py-20 md:px-24 lg:px-28 lg:pt-8 dark:bg-gray-900 lg:overflow-hidden">
         <div>
           <h1 className="text-4xl md:text-6xl lg:text-5xl lg:pt-4 text-center font-semibold dark:text-white">
             Your resume in three <span className="text-teal-500">easy</span> steps
@@ -37,7 +37,6 @@ export default function Home() {
     </>
   );
 }
-
 const Step = () => {
   return (
     <div>
