@@ -27,7 +27,7 @@ export default function Home() {
             <Step />
           </div>
         </div>
-        <div>
+        <div className="2xl:px-32">
           <img src={Image} className="h-96 w-full text-center mx-6" />
           <Button variant="outline" className="rounded-full bg-teal-500 text-white dark:text-black w-full text-sm m-6">
             Select Template

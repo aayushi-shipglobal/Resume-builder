@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import logo from "../assets/resume-icon.jpg";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, X, Menu } from "lucide-react";
+import { Moon, Sun, X, Menu, House, Users } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const DashboardLayout = () => {
@@ -24,7 +24,7 @@ export const DashboardLayout = () => {
   };
 
   return (
-    <div id="toggle" className="h-screen w-screen dark:bg-gray-900">
+    <div id="toggle" className=" dark:bg-gray-900 max-w-full max-h-full">
       <div
         className={`flex justify-between items-center h-14 bg-gray-100 dark:bg-black px-6 py-2.5 fixed left-0 top-0 w-screen text-black`}
       >
@@ -56,13 +56,14 @@ export const DashboardLayout = () => {
               </Button>
             </PopoverTrigger>
             {isOpen && (
-              <PopoverContent className="md:hidden w-80 p-2 bg-gray-100 dark:bg-gray-900 dark:text-white">
-                <div className="dark:bg-gray-900 dark:text-white">
-                  <Link to="/" className="hover:text-blue-700 p-2">
+              <PopoverContent className="md:hidden w-28 py-2 px-1 bg-gray-100 dark:bg-gray-900 dark:text-white">
+                <div className="flex flex-col dark:bg-gray-900 dark:text-white">
+                  <Link to="/" className="hover:text-blue-700 py-2 flex items-center gap-3">
+                    <House className="h-4" />
                     Home
                   </Link>
-                  <Link to="about" className="hover:text-blue-700 p-2">
-                    About
+                  <Link to="about" className="hover:text-blue-700 py-2 flex items-center gap-3">
+                    <Users className="h-4" /> About
                   </Link>
                 </div>
               </PopoverContent>
@@ -70,7 +71,7 @@ export const DashboardLayout = () => {
           </Popover>
         </div>
       </div>
-      <div className="mt-14">
+      <div className="mt-14 2xl:mx-64">
         <Outlet />
       </div>
     </div>
