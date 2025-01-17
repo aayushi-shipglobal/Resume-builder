@@ -30,7 +30,7 @@ export const DashboardLayout = () => {
       >
         <img src={logo} className="h-9 cursor-pointer" />
         <div className="hidden md:flex md:gap-4 md:items-center md:text-sm mr-4 cursor-pointer text-black dark:text-white">
-          <Link to="/" className="hover:text-blue-700">
+          <Link to="home" className="hover:text-blue-700">
             Home
           </Link>
           <Link to="about" className="hover:text-blue-700">
@@ -58,7 +58,7 @@ export const DashboardLayout = () => {
             {isOpen && (
               <PopoverContent className="md:hidden w-28 py-2 px-1 bg-gray-100 dark:bg-gray-900 dark:text-white">
                 <div className="flex flex-col dark:bg-gray-900 dark:text-white">
-                  <Link to="/" className="hover:text-blue-700 py-2 flex items-center gap-3">
+                  <Link to="home" className="hover:text-blue-700 py-2 flex items-center gap-3">
                     <House className="h-4" />
                     Home
                   </Link>

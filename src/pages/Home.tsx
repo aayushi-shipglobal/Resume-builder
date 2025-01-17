@@ -1,5 +1,6 @@
 import Image from "../assets/img.png";
 import { Button } from "@/components/ui/button";
+import {Link} from "react-router-dom";
 
 const Arrays = [
   { title: "Select a template from our collection." },
@@ -29,9 +30,11 @@ export default function Home() {
         </div>
         <div className="2xl:px-32">
           <img src={Image} className="h-96 w-full text-center mx-6" />
-          <Button variant="outline" className="rounded-full bg-teal-500 text-white dark:text-black w-full text-sm m-6">
+          <Link to="home"
+          ><Button variant="outline" className="rounded-full bg-teal-500 text-white dark:text-black w-full text-sm m-6">
             Select Template
-          </Button>
+          </Button></Link>
+          
         </div>
       </div>
     </>
