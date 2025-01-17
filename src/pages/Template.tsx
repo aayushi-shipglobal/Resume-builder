@@ -13,16 +13,16 @@ export default function Template() {
       <div
         className="grid md:grid-cols-2 lg:grid-cols-3 mt-4 lg:mt-16 text-center gap-y-6 gap-x-4 mx-auto pb-4 h-72 overflow-y-auto lg:h-100 lg:col-span-2"
       >
-        <Link to={"#"}>
+        <Link to={"home/resume"}>
           <img src={temp1} className="border border-black rounded-xl h-72" />
         </Link>
-        <Link to={"#"}>
+        <Link to={"home/resume"}>
           <img src={temp2} className="border border-black rounded-xl h-72" />
         </Link>
-        <Link to={"#"}>
+        <Link to={"home/resume"}>
           <img src={temp3} className="border border-black rounded-xl h-72" />
         </Link>
-        <Link to={"#"}>
+        <Link to={"home/resume"}>
           <img src={temp4} className="border border-black rounded-xl h-72" />
         </Link>
       </div>
