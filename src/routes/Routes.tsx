@@ -1,16 +1,25 @@
+import { DashboardLayout } from "@/Layout/DashboardLayout";
+import About from "@/pages/About";
 import Home from "@/pages/Home";
-import { Outlet } from "react-router-dom";
-
+import Template from "@/pages/Template";
 
 export default function Routes() {
   return {
-    path:"/",
-    element:<Outlet/>,
-    children:[
-        {
-            path:"/",
-            element:<Home/>
-        }
-    ]
-  }
+    path: "/",
+    element: <DashboardLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path:"home",
+        element:<Template/>
+      },
+      {
+        path: "about",
+        element: <About />,
+      },
+    ],
+  };
 }
