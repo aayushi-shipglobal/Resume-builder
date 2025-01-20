@@ -3,6 +3,7 @@ import temp1 from "../assets/template1.png";
 import temp2 from "../assets/Template2.jpg";
 import temp3 from "../assets/Template3.jfif";
 import temp4 from "../assets/template4.jpg";
+import { Button } from "@/components/ui/button";
 
 export default function Template() {
   return (
@@ -13,17 +14,21 @@ export default function Template() {
       <div
         className="grid md:grid-cols-2 lg:grid-cols-3 mt-4 lg:mt-16 text-center gap-y-6 gap-x-4 mx-auto pb-4 h-72 overflow-y-auto lg:h-100 lg:col-span-2"
       >
-        <Link to={"home/resume"}>
+        <Link to={"resume"}>
           <img src={temp1} className="border border-black rounded-xl h-72" />
+          <Button className="">Use Template</Button>
         </Link>
-        <Link to={"home/resume"}>
+        <Link to={"resume"}>
           <img src={temp2} className="border border-black rounded-xl h-72" />
+          <Button>Use Template</Button>
         </Link>
-        <Link to={"home/resume"}>
+        <Link to={"resume"}>
           <img src={temp3} className="border border-black rounded-xl h-72" />
+          <Button>Use Template</Button>
         </Link>
-        <Link to={"home/resume"}>
+        <Link to={"resume"}>
           <img src={temp4} className="border border-black rounded-xl h-72" />
+          <Button>Use Template</Button>
         </Link>
       </div>
     </div>

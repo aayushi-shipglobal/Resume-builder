@@ -18,7 +18,7 @@ export default function Routes() {
         element:<Template/>
       },
       {
-        path:"home/resume",
+        path:"resume",
         element:<Resume/>
       },
       {
