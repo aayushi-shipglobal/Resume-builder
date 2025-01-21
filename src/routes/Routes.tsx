@@ -3,6 +3,7 @@ import About from "@/pages/About";
 import Resume from "@/pages/Resume";
 import Home from "@/pages/Home";
 import Template from "@/pages/Template";
+// import path from "path";
 
 export default function Routes() {
   return {
@@ -14,11 +15,12 @@ export default function Routes() {
         element: <Home />,
       },
       {
-        path:"home",
-        element:<Template/>
+        path: "home",
+        element: <Template />,
+       
       },
       {
-        path:"resume",
+        path:"/home/resume",
         element:<Resume/>
       },
       {
