@@ -40,6 +40,7 @@ const formSchema = z.object({
 
 export default function Resume() {
   const [isOpen, setIsOpen] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -67,7 +68,7 @@ export default function Resume() {
     setIsOpen(!isOpen);
   };
   return (
-    <div className="px-3 pt-5 dark:bg-gray-900 grid lg:grid-cols-2">
+    <div className="px-8 pt-5 dark:bg-gray-900 grid lg:grid-cols-2">
       <div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -78,7 +79,6 @@ export default function Resume() {
                 control={form.control}
                 placeholder={"Your Name"}
               />
-
               <FormComponent name="personalDetails.summary" control={form.control} placeholder={"Your Summary"} />
 
               <FormComponent name="personalDetails.workProfile" control={form.control} placeholder={"Work Profile"} />
@@ -95,14 +95,15 @@ export default function Resume() {
               name="technicalSkills"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xl font-bold dark:text-white">Technical Skills</FormLabel>
+                  <FormLabel className="text-black text-xl font-bold dark:text-white">Technical Skills</FormLabel>
+                  <hr />
                   <FormControl>
                     <MultipleSelector
-                      placeholder="Select skills..."
+                      placeholder={field.value.length === 0 ? "Select skills..." : "..."}
                       value={field.value || []}
                       onChange={(newValue) => field.onChange(newValue)}
                       defaultOptions={OPTIONS}
-                      className="mt-5"
+                      className="mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500"
                       emptyIndicator={
                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                           no results found.
@@ -138,15 +139,31 @@ export default function Resume() {
               control={form.control}
               placeholder={"Add Experience"}
             />
-            <div className="grid grid-cols-2 items-start justify-end ">
-              <FormComponent
-                className="mt-6 w-"
-                label="Awards and Achievements"
-                name="awardsAchievements"
+            <div className="grid grid-cols-12 space-x-4 items-start justify-end ">
+              <FormField
                 control={form.control}
-                placeholder={"Use comma to separate Achievement"}
+                name="awardsAchievements"
+                render={({ field }) => (
+                  <FormItem className={`mt-6 col-span-11`}>
+                    <FormLabel className=" text-md md:text-xl font-bold dark:text-white">
+                      Awards and Achievements
+                    </FormLabel>
+                    <hr />
+                    <FormControl>
+                      <div>
+                        <Input
+                          placeholder="Use comma to separate Achievement"
+                          {...field}
+                          disabled={isOpen ? true : false}
+                          className="mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Switch className="mt-8" onClick={() => handleToggle()} />
+              <Switch className="mt-8 col-span-1" onClick={() => handleToggle()} />
             </div>
             <Button type="submit">Submit</Button>
           </form>
@@ -168,7 +185,7 @@ type FormComponentProps = {
 const FormComponent = ({ className, label, name, placeholder, control }: FormComponentProps) => {
   return (
     <div className={className}>
-      <FormLabel className="text-xl font-bold dark:text-white">{label}</FormLabel>
+      <FormLabel className=" text-md md:text-xl font-bold dark:text-white">{label}</FormLabel>
       {label && <hr />}
       <FormField
         control={control}
@@ -176,7 +193,11 @@ const FormComponent = ({ className, label, name, placeholder, control }: FormCom
         render={({ field }) => (
           <FormItem>
             <FormControl>
-              <Input placeholder={placeholder} {...field} className="mt-5" />
+              <Input
+                placeholder={placeholder}
+                {...field}
+                className={`mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500`}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

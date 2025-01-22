@@ -26,7 +26,7 @@ export const DashboardLayout = () => {
   return (
     <div id="toggle" className=" dark:bg-gray-900 max-w-full max-h-full">
       <div
-        className={`flex justify-between items-center h-14 bg-gray-100 dark:bg-black px-6 py-2.5 fixed left-0 top-0 w-screen text-black`}
+        className={`flex justify-between items-center h-14 bg-gray-100 dark:bg-black px-6 py-2.5 fixed z-50 left-0 top-0 w-screen text-black`}
       >
         <img src={logo} className="h-9 cursor-pointer" />
         <div className="hidden md:flex md:gap-4 md:items-center md:text-sm mr-4 cursor-pointer text-black dark:text-white">

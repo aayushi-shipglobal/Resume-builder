@@ -1,4 +1,5 @@
-import { DashboardLayout } from "@/Layout/DashboardLayout";
+// import { DashboardLayout } from "@/Layout/DashboardLayout";
+import TechnicalSkills from "../components/elements/TechnicalSkills"
 import About from "@/pages/About";
 import Resume from "@/pages/Resume";
 import Home from "@/pages/Home";
@@ -8,7 +9,7 @@ import Template from "@/pages/Template";
 export default function Routes() {
   return {
     path: "/",
-    element: <DashboardLayout />,
+    element: <TechnicalSkills />,
     children: [
       {
         path: "/",
