@@ -1,27 +1,13 @@
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import MultipleSelector, { Option } from "@/components/ui/multiple-selector";
-import { Button } from "@/components/ui/button";
 import { z } from "zod";
-import { Switch } from "@/components/ui/switch";
-
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { zodResolver } from "@hookform/resolvers/zod";
+import TechnicalSkills from "@/components/elements/TechnicalSkills";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-const OPTIONS: Option[] = [
-  { label: "nextjs", value: "Nextjs" },
-  { label: "React", value: "react" },
-  { label: "Remix", value: "remix" },
-  { label: "Vite", value: "vite" },
-  { label: "Nuxt", value: "nuxt" },
-  { label: "Vue", value: "vue" },
-  { label: "Svelte", value: "svelte" },
-  { label: "Angular", value: "angular" },
-  { label: "Ember", value: "ember" },
-  { label: "Gatsby", value: "gatsby" },
-  { label: "Astro", value: "astro" },
-];
 const formSchema = z.object({
   personalDetails: z.object({
     name: z.string().min(3, "Name is required"),
@@ -35,7 +21,7 @@ const formSchema = z.object({
   education: z.string().min(5, "Education is required"),
   projects: z.string().min(5, "Projects are required"),
   workExperience: z.string().min(5, "Work experience is required"),
-  awardsAchievements: z.string().min(5, "Awards/achievements are required"),
+  awardsAchievements: z.string().optional(),
 });
 
 export default function Resume() {
@@ -90,31 +76,7 @@ export default function Resume() {
               <FormComponent name="personalDetails.email" control={form.control} placeholder={"Email id"} />
             </div>
 
-            <FormField
-              control={form.control}
-              name="technicalSkills"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-black text-xl font-bold dark:text-white">Technical Skills</FormLabel>
-                  <hr />
-                  <FormControl>
-                    <MultipleSelector
-                      placeholder={field.value.length === 0 ? "Select skills..." : "..."}
-                      value={field.value || []}
-                      onChange={(newValue) => field.onChange(newValue)}
-                      defaultOptions={OPTIONS}
-                      className="mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500"
-                      emptyIndicator={
-                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                          no results found.
-                        </p>
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <TechnicalSkills />
 
             <FormComponent
               className="mt-6"
@@ -145,18 +107,20 @@ export default function Resume() {
                 name="awardsAchievements"
                 render={({ field }) => (
                   <FormItem className={`mt-6 col-span-11`}>
-                    <FormLabel className=" text-md md:text-xl font-bold dark:text-white">
+                    <FormLabel className=" text-md md:text-xl font-bold dark:text-white text-black">
                       Awards and Achievements
                     </FormLabel>
                     <hr />
                     <FormControl>
                       <div>
-                        <Input
-                          placeholder="Use comma to separate Achievement"
-                          {...field}
-                          disabled={isOpen ? true : false}
-                          className="mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500"
-                        />
+                        {isOpen && (
+                          <Input
+                            placeholder="Use comma to separate Achievement"
+                            {...field}
+                            disabled={isOpen ? false : true}
+                            className="mt-5 shadow-lg focus-visible:ring-1 focus-visible:ring-blue-500"
+                          />
+                        )}
                       </div>
                     </FormControl>
                     <FormMessage />

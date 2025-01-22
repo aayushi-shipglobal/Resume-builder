@@ -1,6 +1,8 @@
+import { Plus, X } from "lucide-react";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addSkill, deleteSkill,Skill } from "../../reducer/action";
+import { addSkill, deleteSkill, Skill } from "../../reducer/action";
+import { Input } from "../ui/input";
 
 const skillSuggestions = [
   "JavaScript",
@@ -27,6 +29,7 @@ const TechnicalSkills = () => {
 
   const [inputSkill, setInputSkill] = useState<string>("");
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(skillSuggestions);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -37,6 +40,11 @@ const TechnicalSkills = () => {
     } else {
       setFilteredSuggestions(skillSuggestions);
     }
+  };
+
+  const handleFocus = () => {
+    setShowSuggestions(!showSuggestions);
+    setFilteredSuggestions(skillSuggestions);
   };
 
   const handleAddSkill = () => {
@@ -51,34 +59,51 @@ const TechnicalSkills = () => {
   };
 
   const handleSelectSuggestion = (suggestion: string) => {
-    setInputSkill(suggestion);
+    dispatch(addSkill(suggestion));
+    setShowSuggestions(!showSuggestions);
+    setInputSkill("");
     setFilteredSuggestions([]);
   };
 
   return (
     <div>
-      <h2>Technical Skills</h2>
+      <p className=" text-md md:text-xl font-bold dark:text-white">Technical Skills</p>
+      <hr />
 
-      <div>
-        <input type="text" value={inputSkill} onChange={handleInputChange} placeholder="Add a technical skill" />
-        <button onClick={handleAddSkill}>Add Skill</button>
+      <div className="flex items-center justify-center cursor-pointer">
+        <Input
+          type="text"
+          value={inputSkill}
+          onChange={handleInputChange}
+          onClick={handleFocus}
+          placeholder="Add skills"
+          className={`mt-5 shadow-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 transition-colors rounded-md px-3 py-1 text-sm`}
+        />
+        <Plus onClick={handleAddSkill} className="pt-5 size-9 -ml-9 font-bold" type="button" />
       </div>
 
-      {inputSkill && (
-        <ul>
+      {filteredSuggestions.length > 0 && showSuggestions && (
+        <ul className="mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-10">
           {filteredSuggestions.map((suggestion, index) => (
-            <li key={index} onClick={() => handleSelectSuggestion(suggestion)}>
+            <li
+              key={index}
+              onClick={() => handleSelectSuggestion(suggestion)}
+              className="px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+            >
               {suggestion}
             </li>
           ))}
         </ul>
       )}
 
-      <h3>Added Skills</h3>
-      <ul>
-        {skills.map((skill:Skill) => (
-          <li key={skill.id}>
-            {skill.text} <button onClick={() => handleDeleteSkill(skill.id)}>Delete</button>
+      <ul className="flex flex-row gap-x-2 cursor-pointer">
+        {skills.map((skill: Skill) => (
+          <li
+            key={skill.id}
+            className="inline-flex gap-x-1 items-center justify-center text-sm px-1 pb-0.5 text-white bg-teal-500 rounded-3xl text-center mt-2 max-w-max"
+          >
+            <span className="pl-2">{skill.text}</span>
+            <X className="size-4 pt-0.5" onClick={() => handleDeleteSkill(skill.id)} />
           </li>
         ))}
       </ul>

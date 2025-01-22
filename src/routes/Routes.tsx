@@ -1,15 +1,13 @@
-// import { DashboardLayout } from "@/Layout/DashboardLayout";
-import TechnicalSkills from "../components/elements/TechnicalSkills"
+import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Resume from "@/pages/Resume";
-import Home from "@/pages/Home";
 import Template from "@/pages/Template";
-// import path from "path";
+import { DashboardLayout } from "@/Layout/DashboardLayout";
 
 export default function Routes() {
   return {
     path: "/",
-    element: <TechnicalSkills />,
+    element: <DashboardLayout />,
     children: [
       {
         path: "/",
@@ -18,11 +16,10 @@ export default function Routes() {
       {
         path: "home",
         element: <Template />,
-       
       },
       {
-        path:"/home/resume",
-        element:<Resume/>
+        path: "/home/resume",
+        element: <Resume />,
       },
       {
         path: "about",
