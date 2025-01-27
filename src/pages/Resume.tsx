@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Plus, X, Mail, Phone, MapPin } from "lucide-react";
 import { addSkill, deleteSkill, Skill } from "../reducer/action";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 
 const skillSuggestions = [
   "JavaScript",
@@ -47,8 +48,12 @@ const formSchema = z.object({
       .string()
       .min(4, "Year is required")
       .regex(/^\d{4}$/, "Invalid Year format"),
+    degree: z.string(),
   }),
-  projects: z.string().min(5, "Projects are required"),
+  projects: z.object({
+    project: z.string().min(5, "Projects are required"),
+    description: z.string(),
+  }),
   workExperience: z.object({
     companyName: z.string().min(5, "Company Name is required"),
     year: z
@@ -120,8 +125,12 @@ export default function Resume() {
       education: {
         school: "",
         year: "",
+        degree: "",
       },
-      projects: "",
+      projects: {
+        project: "",
+        description: "",
+      },
       workExperience: {
         companyName: "",
         year: "",
@@ -142,7 +151,9 @@ export default function Resume() {
   // const technicalSkills = watch("technicalSkills");
   const school = watch("education.school");
   const year = watch("education.year");
-  const projects = watch("projects");
+  const degree = watch("education.degree");
+  const project = watch("projects.project");
+  const description = watch("projects.description");
   const companyName = watch("workExperience.companyName");
   const yearWork = watch("workExperience.year");
   const designation = watch("workExperience.designation");
@@ -160,7 +171,9 @@ export default function Resume() {
       // technicalSkills,
       school,
       year,
-      projects,
+      degree,
+      project,
+      description,
       companyName,
       yearWork,
       designation,
@@ -176,7 +189,9 @@ export default function Resume() {
     // technicalSkills,
     school,
     year,
-    projects,
+    degree,
+    project,
+    description,
     companyName,
     yearWork,
     designation,
@@ -239,7 +254,7 @@ export default function Resume() {
                 <div className="cursor-pointer">
                   <FormLabel className=" text-md md:text-xl font-bold dark:text-white">Technical Skills</FormLabel>
                   <hr />
-                  <div className="">
+                  <div>
                     <input
                       value={inputSkill}
                       onChange={handleInputChange}
@@ -289,7 +304,25 @@ export default function Resume() {
                   <Switch className="mt-8 col-span-1 mb-1" onClick={() => handleToggle1()} />
                 </div>
                 <hr />
-                <div className="grid grid-cols-2 items-center space-x-4 justify-center">
+                <div className="grid grid-cols-3 items-center space-x-4 justify-center">
+                  <FormField
+                    control={form.control}
+                    name="education.degree"
+                    render={({ field }) => (
+                      <FormItem className="mt-6">
+                        <FormControl>
+                          {isOpen1 && (
+                            <Input
+                              placeholder="Degree"
+                              {...field}
+                              className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
+                            />
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="education.school"
@@ -333,11 +366,25 @@ export default function Resume() {
               <FormComponent
                 className="mt-6"
                 label="Projects"
-                name="projects"
+                name="projects.project"
                 control={form.control}
                 placeholder={"Add Projects"}
               />
-
+              <FormField
+                control={form.control}
+                name="projects.description"
+                render={({ field }) => (
+                  <FormItem className={`mt-2`}>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Description"
+                        {...field}
+                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
               <div className="mt-5">
                 <div className="grid grid-cols-12">
                   <FormLabel className="col-span-11 mt-6 text-md md:text-xl font-bold dark:text-white">
@@ -466,42 +513,64 @@ export default function Resume() {
           </p>
         </div>
         <div className="text-center font-bold text-lg my-1">
-        {workProfile && workProfile.length > 0 ? workProfile : "Work Profile"}
+          {workProfile && workProfile.length > 0 ? workProfile : "Work Profile"}
         </div>
         <div>
-          <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Technical Skills</div>
-          <ul className="m-6 cursor-pointer list-disc">
+          <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Technical Skills</div>
+          <ul className="mx-6 my-3 cursor-pointer list-disc text-base">
+            {
+              skills.length ==0 && <span>Add your skills here</span>
+            }
             {skills.map((skill: Skill) => (
               <li key={skill.id}>
                 <span className="pl-2">{skill.text}</span>
               </li>
             ))}
           </ul>
-          </div>
-          
-        <div>
-          <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Projects</div>
-          <p className="pl-6">{projects && projects.length > 0 ? projects : "Project Title"}</p>
         </div>
 
-       
+        <div>
+          <div className="font-bold text-lg pl-9 px-2 py-1  bg-custom-gray ">Projects</div>
+          <li className="pl-6 list-disc mt-2">{project && project.length > 0 ? project : "Project Title"}</li>
+          <p className="pl-16 text-sm text-gray-600 mb-4">
+            {description && description.length > 0 ? description : "Project Description"}
+          </p>
+        </div>
+
         {isOpen1 && (
           <div>
-            <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Education</div>
-            <div className="flex justify-between py-6">
-              <p className="pl-6 py-1">{school && school.length > 0 ? school : "Education Title"}</p>
-              <p className="px-6 py-1">{year && year.length > 0 ? year : ""}</p>
+            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Education</div>
+            <div className="flex justify-between py-3">
+              <div className="flex space-x-2 items-center">
+                <p className="pl-6 py-1">{degree && degree.length > 0 ? degree : "Degree"}</p>
+                <span>|</span>
+                <p className="py-1">{school && school.length > 0 ? school : "School"}</p>
+              </div>
+              <i className="px-6 py-1">{year && year.length > 0 ? year : "year"}</i>
             </div>
           </div>
         )}
         {isOpen2 && (
-          <div>
-            <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Work Experience</div>
-            <div className="flex justify-between pt-6">
+          <div className="mb-3">
+            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Work Experience</div>
+            <div className="flex justify-between pt-2 text-base">
               <p className="pl-6">{companyName && companyName.length > 0 ? companyName : "Work Experience"}</p>
-              <p className="px-6">{yearWork && yearWork.length > 0 ? yearWork : ""}</p>
-            </div>{" "}
-            <p className="pl-6">{designation && designation.length > 0 ? designation : ""}</p>
+              <i className="px-6">{yearWork && yearWork.length > 0 ? yearWork : "year"}</i>
+            </div>
+            <i className="pl-8 text-sm">{designation && designation.length > 0 ? designation : "Designation"}</i>
+          </div>
+        )}
+
+        {isOpen && (
+          <div>
+            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Awards and Achievements</div>
+            <div className="flex justify-between pt-2 text-base">
+              <p className="pl-6 text-sm text-gray-500">
+                {awardsAchievements && awardsAchievements.length > 0
+                  ? awardsAchievements
+                  : "Share your key accomplishments and accolades here..."}
+              </p>
+            </div>
           </div>
         )}
       </div>
