@@ -215,10 +215,10 @@ export default function Resume() {
   };
 
   return (
-    <div className="px-8 py-5 dark:bg-gray-900 grid lg:grid-cols-2 space-x-6 bg-teal-700 ">
+    <div className="px-8 py-5 dark:bg-gray-900 grid lg:grid-cols-3 space-x-8 bg-teal-700 ">
       <div className="col-span-1 rounded-md">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 h-auto overflow-y-auto">
             <div className="border border-gray-100 rounded-md p-6 bg-white">
               <FormComponent
                 label="Personal Details"
@@ -496,7 +496,7 @@ export default function Resume() {
           </form>
         </Form>
       </div>
-      <div className="bg-white border border-gray-100 rounded-md w-full max-h-max py-6">
+      <div className="col-span-2 mx-6 bg-white border border-gray-100 rounded-md  max-h-max py-6">
         <p className="font-bold text-3xl text-center mb-2"> {name && name.length > 0 ? name : "Your Name"} </p>
         <div className="flex space-x-4 items-center justify-center text-gray-500 text-sm mb-2">
           <p className="flex items-center gap-1">
@@ -518,9 +518,7 @@ export default function Resume() {
         <div>
           <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Technical Skills</div>
           <ul className="mx-6 my-3 cursor-pointer list-disc text-base">
-            {
-              skills.length ==0 && <span>Add your skills here</span>
-            }
+            {skills.length == 0 && <span>Add your skills here</span>}
             {skills.map((skill: Skill) => (
               <li key={skill.id}>
                 <span className="pl-2">{skill.text}</span>
