@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Plus, X, Mail, Phone, MapPin } from "lucide-react";
 import { addSkill, deleteSkill, Skill } from "../reducer/action";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const skillSuggestions = [
   "JavaScript",
@@ -39,7 +38,9 @@ const formSchema = z.object({
     phone: z.string().min(10, "Phone number is required"),
     email: z.string().email("Invalid email address").min(5, "Email is required"),
   }),
-  technicalSkills: z.array(z.object({ label: z.string(), value: z.string() })).min(1, "At least one skill is required"),
+  category: z.string().optional(),
+
+  technicalSkills: z.string().min(1, "At least one skill is required"),
   education: z.object({
     school: z.string().min(5, "School Name is required"),
     year: z
@@ -63,11 +64,11 @@ export default function Resume() {
   const [isOpen, setIsOpen] = useState(true);
   const dispatch = useDispatch();
   const skills = useSelector((state: any) => state.tasks.tasks);
-
+  const [isOpen1, setIsOpen1] = useState(true);
+  const [isOpen2, setIsOpen2] = useState(true);
   const [inputSkill, setInputSkill] = useState<string>("");
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(skillSuggestions);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [toggle, setToggle] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -75,7 +76,7 @@ export default function Resume() {
 
     if (value.length > 0) {
       setFilteredSuggestions(skillSuggestions.filter((skill) => skill.toLowerCase().includes(value.toLowerCase())));
-      setToggle(!toggle);
+      setShowSuggestions(true);
     } else {
       setFilteredSuggestions(skillSuggestions);
     }
@@ -115,7 +116,7 @@ export default function Resume() {
         phone: "",
         email: "",
       },
-      technicalSkills: [],
+      technicalSkills: "",
       education: {
         school: "",
         year: "",
@@ -138,7 +139,7 @@ export default function Resume() {
   const address = watch("personalDetails.address");
   const phone = watch("personalDetails.phone");
   const email = watch("personalDetails.email");
-  const technicalSkills = watch("technicalSkills");
+  // const technicalSkills = watch("technicalSkills");
   const school = watch("education.school");
   const year = watch("education.year");
   const projects = watch("projects");
@@ -156,7 +157,7 @@ export default function Resume() {
       address,
       phone,
       email,
-      technicalSkills,
+      // technicalSkills,
       school,
       year,
       projects,
@@ -172,7 +173,7 @@ export default function Resume() {
     address,
     phone,
     email,
-    technicalSkills,
+    // technicalSkills,
     school,
     year,
     projects,
@@ -190,6 +191,14 @@ export default function Resume() {
     setIsOpen(!isOpen);
   };
 
+  const handleToggle1 = () => {
+    setIsOpen1(!isOpen1);
+  };
+
+  const handleToggle2 = () => {
+    setIsOpen2(!isOpen2);
+  };
+
   return (
     <div className="px-8 py-5 dark:bg-gray-900 grid lg:grid-cols-2 space-x-6 bg-teal-700 ">
       <div className="col-span-1 rounded-md">
@@ -202,44 +211,41 @@ export default function Resume() {
                 control={form.control}
                 placeholder={"Your Name"}
               />
-              <FormComponent name="personalDetails.summary" control={form.control} placeholder={"Your Summary  (optional)"} />
+              <FormComponent
+                name="personalDetails.summary"
+                control={form.control}
+                placeholder={"Your Summary  (optional)"}
+              />
 
-              <FormComponent name="personalDetails.workProfile" control={form.control} placeholder={"Work Profile  (optional)"} />
+              <FormComponent
+                name="personalDetails.workProfile"
+                control={form.control}
+                placeholder={"Work Profile  (optional)"}
+              />
 
-              <FormComponent name="personalDetails.address" control={form.control} placeholder={"Address  (optional)"} />
+              <FormComponent
+                name="personalDetails.address"
+                control={form.control}
+                placeholder={"Address  (optional)"}
+              />
 
               <FormComponent name="personalDetails.phone" control={form.control} placeholder={"Phone number"} />
 
               <FormComponent name="personalDetails.email" control={form.control} placeholder={"Email id"} />
             </div>
+
             <div className="border border-gray-100 rounded-md p-6 bg-white">
               <div>
                 <div className="cursor-pointer">
                   <FormLabel className=" text-md md:text-xl font-bold dark:text-white">Technical Skills</FormLabel>
                   <hr />
                   <div className="">
-                    <FormField
-                      control={form.control}
-                      name="technicalSkills"
-                      render={({ field }) => (
-                        <FormItem className="">
-                          <FormControl>
-                            <Input
-                              value={inputSkill}
-                              onChange={handleInputChange}
-                              // onChange={(e) => {
-                              //   handleInputChange(e);
-                              //   field.onChange(e);
-                              // }}
-                              onClick={handleFocus}
-                              placeholder="Add Skills ..."
-                              {...field}
-                              className={`mt-5 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <input
+                      value={inputSkill}
+                      onChange={handleInputChange}
+                      onClick={handleFocus}
+                      placeholder="Add Skills ..."
+                      className={`flex h-9 w-full rounded-md border border-input px-3 py-1 text-base shadow-sm  focus-visible:outline-none focus-visible:ring-blue-500  md:text-sm mt-5  focus-visible:ring-1 `}
                     />
 
                     <div className="flex justify-end">
@@ -274,12 +280,13 @@ export default function Resume() {
                   ))}
                 </ul>
               </div>
+
               <div className="mt-5">
                 <div className="grid grid-cols-12">
                   <FormLabel className="col-span-11 mt-6 text-md md:text-xl font-bold dark:text-white">
                     Education
                   </FormLabel>
-                  <Switch className="mt-8 col-span-1 mb-1" onClick={() => handleToggle()} />
+                  <Switch className="mt-8 col-span-1 mb-1" onClick={() => handleToggle1()} />
                 </div>
                 <hr />
                 <div className="grid grid-cols-2 items-center space-x-4 justify-center">
@@ -289,7 +296,7 @@ export default function Resume() {
                     render={({ field }) => (
                       <FormItem className="mt-6">
                         <FormControl>
-                          {isOpen && (
+                          {isOpen1 && (
                             <Input
                               placeholder="School Name"
                               {...field}
@@ -308,7 +315,7 @@ export default function Resume() {
                     render={({ field }) => (
                       <FormItem className="mt-6">
                         <FormControl>
-                          {isOpen && (
+                          {isOpen1 && (
                             <Input
                               placeholder="Year"
                               {...field}
@@ -336,7 +343,7 @@ export default function Resume() {
                   <FormLabel className="col-span-11 mt-6 text-md md:text-xl font-bold dark:text-white">
                     Work Experience
                   </FormLabel>
-                  <Switch className="mt-8 col-span-1 mb-1" onClick={() => handleToggle()} />
+                  <Switch className="mt-8 col-span-1 mb-1" onClick={() => handleToggle2()} />
                 </div>
 
                 <hr />
@@ -347,7 +354,7 @@ export default function Resume() {
                     render={({ field }) => (
                       <FormItem className={`mt-6`}>
                         <FormControl>
-                          {isOpen && (
+                          {isOpen2 && (
                             <span className="flex items-center gap-1">
                               <Input
                                 placeholder="Company Name"
@@ -368,7 +375,7 @@ export default function Resume() {
                     render={({ field }) => (
                       <FormItem className={`mt-6`}>
                         <FormControl>
-                          {isOpen && (
+                          {isOpen2 && (
                             <span className="flex items-center gap-1">
                               <Input
                                 placeholder="Year"
@@ -390,7 +397,7 @@ export default function Resume() {
                     render={({ field }) => (
                       <FormItem className={`mt-6`}>
                         <FormControl>
-                          {isOpen && (
+                          {isOpen2 && (
                             <span className="flex items-center gap-1">
                               <Input
                                 placeholder="Designation"
@@ -442,7 +449,7 @@ export default function Resume() {
           </form>
         </Form>
       </div>
-      <div className="bg-white border border-gray-100 rounded-md w-full py-6">
+      <div className="bg-white border border-gray-100 rounded-md w-full max-h-max py-6">
         <p className="font-bold text-3xl text-center mb-2"> {name && name.length > 0 ? name : "Your Name"} </p>
         <div className="flex space-x-4 items-center justify-center text-gray-500 text-sm mb-2">
           <p className="flex items-center gap-1">
@@ -458,29 +465,45 @@ export default function Resume() {
             {phone && phone.length > 0 ? phone : "Phone Number"}
           </p>
         </div>
-        <div>
-          <div className="font-bold text-xl pl-9 p-2 bg-teal-500">Technical Skills</div>
-        </div>
-        <div className="py-9"></div>
-        <div>
-          <div className="font-bold text-xl pl-9 p-2 bg-teal-500">Projects</div>
-          <p className="pl-6 py-9">{projects && projects.length > 0 ? projects : "Project Title"}</p>
+        <div className="text-center font-bold text-lg my-1">
+        {workProfile && workProfile.length > 0 ? workProfile : "Work Profile"}
         </div>
         <div>
-          <div className="font-bold text-xl pl-9 p-2 bg-teal-500">Education</div>
-          <div className="flex justify-between py-6">
-            <p className="pl-6 py-1">{school && school.length > 0 ? school : "Education Title"}</p>
-            <p className="px-6 py-1">{year && year.length > 0 ? year : ""}</p>
+          <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Technical Skills</div>
+          <ul className="m-6 cursor-pointer list-disc">
+            {skills.map((skill: Skill) => (
+              <li key={skill.id}>
+                <span className="pl-2">{skill.text}</span>
+              </li>
+            ))}
+          </ul>
           </div>
-        </div>
+          
         <div>
-          <div className="font-bold text-xl pl-9 p-2 bg-teal-500">Work Experience</div>
-          <div className="flex justify-between pt-6">
-            <p className="pl-6">{companyName && companyName.length > 0 ? companyName : "Work Experience"}</p>
-            <p className="px-6">{yearWork && yearWork.length > 0 ? yearWork : ""}</p>
-          </div>{" "}
-          <p className="pl-6">{designation && designation.length > 0 ? designation : ""}</p>
+          <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Projects</div>
+          <p className="pl-6">{projects && projects.length > 0 ? projects : "Project Title"}</p>
         </div>
+
+       
+        {isOpen1 && (
+          <div>
+            <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Education</div>
+            <div className="flex justify-between py-6">
+              <p className="pl-6 py-1">{school && school.length > 0 ? school : "Education Title"}</p>
+              <p className="px-6 py-1">{year && year.length > 0 ? year : ""}</p>
+            </div>
+          </div>
+        )}
+        {isOpen2 && (
+          <div>
+            <div className="font-bold text-lg pl-9 p-2 bg-custom-gray ">Work Experience</div>
+            <div className="flex justify-between pt-6">
+              <p className="pl-6">{companyName && companyName.length > 0 ? companyName : "Work Experience"}</p>
+              <p className="px-6">{yearWork && yearWork.length > 0 ? yearWork : ""}</p>
+            </div>{" "}
+            <p className="pl-6">{designation && designation.length > 0 ? designation : ""}</p>
+          </div>
+        )}
       </div>
     </div>
   );
