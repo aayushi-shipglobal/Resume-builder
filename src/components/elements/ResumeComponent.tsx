@@ -1,4 +1,4 @@
-interface ResumeComponentProps {
+type ResumeComponentProps= {
     Icon: any;
     title: string;
     placeholder: string;

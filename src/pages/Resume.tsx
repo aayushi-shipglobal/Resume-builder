@@ -12,7 +12,8 @@ import { addSkill, deleteSkill, Skill } from "../reducer/action";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { ResumeComponent } from "@/components/elements/ResumeComponent";
-import { FormComponent } from "@/components/elements/FormComponent";
+import { PersonalDetailsForm } from "@/components/elements/PersonalDetailsForm";
+import { ProjectDetails } from "@/components/elements/ProjectDetails";
 
 const skillSuggestions = [
   "JavaScript",
@@ -225,35 +226,7 @@ export default function Resume() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="">
-              <div className="border border-gray-100 rounded-md p-6 mb-4 bg-white">
-                <FormComponent
-                  label="Personal Details"
-                  name="personalDetails.name"
-                  control={form.control}
-                  placeholder={"Your Name"}
-                />
-                <FormComponent
-                  name="personalDetails.summary"
-                  control={form.control}
-                  placeholder={"Your Summary  (optional)"}
-                />
-
-                <FormComponent
-                  name="personalDetails.workProfile"
-                  control={form.control}
-                  placeholder={"Work Profile  (optional)"}
-                />
-
-                <FormComponent
-                  name="personalDetails.address"
-                  control={form.control}
-                  placeholder={"Address  (optional)"}
-                />
-
-                <FormComponent name="personalDetails.phone" control={form.control} placeholder={"Phone number"} />
-
-                <FormComponent name="personalDetails.email" control={form.control} placeholder={"Email id"} />
-              </div>
+              <PersonalDetailsForm control={form.control} />
 
               <div className="border border-gray-100 rounded-md p-6 bg-white">
                 <div>
@@ -365,48 +338,7 @@ export default function Resume() {
                     )}
                   />
                 </div>
-                <div className="mt-6">
-                  <FormLabel className="text-md md:text-xl font-bold dark:text-white">Projects</FormLabel>
-                  <hr />
-                </div>
-
-                <div className="grid grid-cols-2 items-center space-x-2">
-                  <FormField
-                    control={form.control}
-                    name="projects.project"
-                    render={({ field }) => (
-                      <FormItem className="mt-6">
-                        <FormControl>
-                          {isOpen1 && (
-                            <Input
-                              placeholder="Add Projects"
-                              {...field}
-                              className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                            />
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Input value={link} placeholder="Add Link..." onChange={handleLinkChange} className="mt-6 w-30" />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="projects.description"
-                  render={({ field }) => (
-                    <FormItem className={`mt-2`}>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Description"
-                          {...field}
-                          className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <ProjectDetails control={form.control} value={link} onChange={handleLinkChange} Open={isOpen1} />
                 <div className="mt-5">
                   <div className="flex items-center justify-between">
                     <FormLabel className="text-md md:text-xl font-bold dark:text-white text-black">
