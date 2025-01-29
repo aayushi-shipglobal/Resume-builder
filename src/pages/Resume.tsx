@@ -2,37 +2,19 @@ import { z } from "zod";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch, useSelector } from "react-redux";
-import { Plus, X, Mail, Phone, MapPin } from "lucide-react";
-import { addSkill, deleteSkill, Skill } from "../reducer/action";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+import { useSelector } from "react-redux";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { Skill } from "../reducer/action";
+import { Form } from "@/components/ui/form";
 import { ResumeComponent } from "@/components/elements/ResumeComponent";
 import { PersonalDetailsForm } from "@/components/elements/PersonalDetailsForm";
 import { ProjectDetails } from "@/components/elements/ProjectDetails";
-
-const skillSuggestions = [
-  "JavaScript",
-  "TypeScript",
-  "React",
-  "Node.js",
-  "CSS",
-  "HTML",
-  "Python",
-  "Java",
-  "Go",
-  "Docker",
-  "AWS",
-  "Git",
-  "SQL",
-  "GraphQL",
-  "Redux",
-  "Jest",
-];
+import { EducationDetails } from "@/components/elements/EducationDetails";
+import { WorkExperience } from "@/components/elements/WorkExperience";
+import { AwardsAchievements } from "@/components/elements/AwardsAchievements";
+import { TechnicalSkills } from "@/components/elements/TechnicalSkills";
 
 const formSchema = z.object({
   personalDetails: z.object({
@@ -72,48 +54,9 @@ const formSchema = z.object({
 export default function Resume() {
   const [isOpen, setIsOpen] = useState(true);
   const [link, setLink] = useState("");
-  const dispatch = useDispatch();
   const skills = useSelector((state: any) => state.tasks.tasks);
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
-  const [inputSkill, setInputSkill] = useState<string>("");
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>(skillSuggestions);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setInputSkill(value);
-
-    if (value.length > 0) {
-      setFilteredSuggestions(skillSuggestions.filter((skill) => skill.toLowerCase().includes(value.toLowerCase())));
-      setShowSuggestions(true);
-    } else {
-      setFilteredSuggestions(skillSuggestions);
-    }
-  };
-
-  const handleFocus = () => {
-    setShowSuggestions(!showSuggestions);
-    setFilteredSuggestions(skillSuggestions);
-  };
-
-  const handleAddSkill = () => {
-    if (inputSkill.trim() !== "") {
-      dispatch(addSkill(inputSkill));
-      setInputSkill("");
-    }
-  };
-
-  const handleDeleteSkill = (skillId: number) => {
-    dispatch(deleteSkill(skillId));
-  };
-
-  const handleSelectSuggestion = (suggestion: string) => {
-    dispatch(addSkill(suggestion));
-    setShowSuggestions(!showSuggestions);
-    setInputSkill("");
-    setFilteredSuggestions([]);
-  };
 
   const handleLinkChange = (e: any) => {
     setLink(e.target.value);
@@ -225,229 +168,17 @@ export default function Resume() {
       <div className="rounded-md w-2/5 h-600 overflow-y-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="">
-              <PersonalDetailsForm control={form.control} />
+            <PersonalDetailsForm control={form.control} />
 
-              <div className="border border-gray-100 rounded-md p-6 bg-white">
-                <div>
-                  <div className="cursor-pointer">
-                    <FormLabel className=" text-md md:text-xl font-bold dark:text-white">Technical Skills</FormLabel>
-                    <hr />
-                    <div>
-                      <input
-                        value={inputSkill}
-                        onChange={handleInputChange}
-                        onClick={handleFocus}
-                        placeholder="Add Skills ..."
-                        className={`flex h-9 w-full rounded-md border border-input px-3 py-1 text-base shadow-sm  focus-visible:outline-none focus-visible:ring-blue-500  md:text-sm mt-5  focus-visible:ring-1 `}
-                      />
-
-                      <div className="flex justify-end">
-                        <Plus onClick={handleAddSkill} className="pt-5 size-9 -ml-9 font-bold -my-12" type="button" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {filteredSuggestions.length > 0 && showSuggestions && (
-                    <ul className="mt-1 w-full bg-white border border-gray-300 rounded-md shadow-sm max-h-60 overflow-y-auto z-10">
-                      {filteredSuggestions.map((suggestion, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleSelectSuggestion(suggestion)}
-                          className="px-3 py-1 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        >
-                          {suggestion}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <ul className="flex flex-row gap-x-2 cursor-pointer">
-                    {skills.map((skill: Skill) => (
-                      <li
-                        key={skill.id}
-                        className="inline-flex gap-x-1 items-center justify-center text-sm px-1 pb-0.5 text-white bg-teal-500 rounded-3xl text-center mt-2 max-w-max"
-                      >
-                        <span className="pl-2">{skill.text}</span>
-                        <X className="size-4 pt-0.5" onClick={() => handleDeleteSkill(skill.id)} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-2">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="mt-6 text-md md:text-xl font-bold dark:text-white">Education</FormLabel>
-                    <Switch className="mt-8 mb-1" onClick={() => handleToggle1()} />
-                  </div>
-                  <hr />
-                  <div className="grid grid-cols-2 items-center space-x-4 justify-center">
-                    <FormField
-                      control={form.control}
-                      name="education.degree"
-                      render={({ field }) => (
-                        <FormItem className="mt-6">
-                          <FormControl>
-                            {isOpen1 && (
-                              <Input
-                                placeholder="Degree"
-                                {...field}
-                                className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="education.school"
-                      render={({ field }) => (
-                        <FormItem className="mt-6">
-                          <FormControl>
-                            {isOpen1 && (
-                              <Input
-                                placeholder="School Name"
-                                {...field}
-                                className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                              />
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="education.year"
-                    render={({ field }) => (
-                      <FormItem className="mt-2 w-1/2">
-                        <FormControl>
-                          {isOpen1 && (
-                            <Input
-                              placeholder="Year"
-                              {...field}
-                              className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                            />
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <ProjectDetails control={form.control} value={link} onChange={handleLinkChange} Open={isOpen1} />
-                <div className="mt-5">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="text-md md:text-xl font-bold dark:text-white text-black">
-                      Work Experience
-                    </FormLabel>
-                    <Switch className="mt-8 mb-1" onClick={() => handleToggle2()} />
-                  </div>
-
-                  <hr />
-                  <div className="grid grid-cols-2 items-center space-x-4 justify-center">
-                    <FormField
-                      control={form.control}
-                      name="workExperience.companyName"
-                      render={({ field }) => (
-                        <FormItem className={`mt-6`}>
-                          <FormControl>
-                            {isOpen2 && (
-                              <span className="flex items-center gap-1">
-                                <Input
-                                  placeholder="Company Name"
-                                  {...field}
-                                  className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                                />
-                              </span>
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="workExperience.year"
-                      render={({ field }) => (
-                        <FormItem className={`mt-6`}>
-                          <FormControl>
-                            {isOpen2 && (
-                              <span className="flex items-center gap-1">
-                                <Input
-                                  placeholder="Year"
-                                  {...field}
-                                  className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                                />
-                              </span>
-                            )}
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="workExperience.designation"
-                    render={({ field }) => (
-                      <FormItem className={`mt-2`}>
-                        <FormControl>
-                          {isOpen2 && (
-                            <span className="flex items-center gap-1">
-                              <Input
-                                placeholder="Designation"
-                                {...field}
-                                className={`w-1/2 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                              />
-                            </span>
-                          )}
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="mt-2">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="mt-6 text-md md:text-xl font-bold dark:text-white">
-                      Awards and Achievements
-                    </FormLabel>
-                    <Switch className="mt-8 mb-1" onClick={() => handleToggle()} />
-                  </div>
-                  <hr />
-                  <div className="flex space-x-0 items-start justify-between ">
-                    <FormField
-                      control={form.control}
-                      name="awardsAchievements"
-                      render={({ field }) => (
-                        <FormItem className={` w-full`}>
-                          <FormControl>
-                            <div>
-                              {isOpen && (
-                                <Input
-                                  placeholder="Use comma to separate Achievement"
-                                  {...field}
-                                  disabled={isOpen ? false : true}
-                                  className="mt-5 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                                />
-                              )}
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-                <Button type="submit" className="mt-2 bg-teal-600 text-white">
-                  Submit
-                </Button>
-              </div>
+            <div className="border border-gray-100 rounded-md p-6 bg-white">
+              <TechnicalSkills />
+              <EducationDetails control={form.control} onClick={handleToggle1} Open1={isOpen1} />
+              <ProjectDetails control={form.control} value={link} onChange={handleLinkChange} />
+              <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
+              <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
+              <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                Submit
+              </Button>
             </div>
           </form>
         </Form>

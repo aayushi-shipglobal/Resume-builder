@@ -3,13 +3,12 @@ import { Textarea } from "../ui/textarea";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type ProjectDetailsProps = {
-  Open: boolean;
   value: string;
   onChange: any;
   control: any;
 };
 
-export const ProjectDetails = ({ control, value, Open, onChange }: ProjectDetailsProps) => {
+export const ProjectDetails = ({ control, value, onChange }: ProjectDetailsProps) => {
   return (
     <div>
       <div className="mt-6">
@@ -24,13 +23,13 @@ export const ProjectDetails = ({ control, value, Open, onChange }: ProjectDetail
           render={({ field }) => (
             <FormItem className="mt-6">
               <FormControl>
-                {Open && (
+                
                   <Input
                     placeholder="Add Projects"
                     {...field}
                     className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                   />
-                )}
+                
               </FormControl>
               <FormMessage />
             </FormItem>
