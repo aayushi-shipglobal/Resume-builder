@@ -54,6 +54,7 @@ export default {
       },
       spacing: {
         100: "25rem",
+        600:"600px"
       },
     },
   },
