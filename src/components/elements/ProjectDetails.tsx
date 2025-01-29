@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -23,13 +24,11 @@ export const ProjectDetails = ({ control, value, onChange }: ProjectDetailsProps
           render={({ field }) => (
             <FormItem className="mt-6">
               <FormControl>
-                
-                  <Input
-                    placeholder="Add Projects"
-                    {...field}
-                    className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                  />
-                
+                <Input
+                  placeholder="Add Projects"
+                  {...field}
+                  className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -53,6 +52,11 @@ export const ProjectDetails = ({ control, value, onChange }: ProjectDetailsProps
           </FormItem>
         )}
       />
+
+      <div className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer">
+        <Plus className="size-4" />
+        Add Projects
+      </div>
     </div>
   );
 };

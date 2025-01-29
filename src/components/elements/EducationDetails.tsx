@@ -1,6 +1,7 @@
 import { Input } from "../ui/input";
 import { Switch } from "@/components/ui/switch";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Plus } from "lucide-react";
 
 type EducationDetailsProps = {
   control: any;
@@ -16,6 +17,8 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
         <Switch className="mt-8 mb-1" onClick={onClick} />
       </div>
       <hr />
+      {Open1 &&(
+      <div>
       <div className="grid grid-cols-2 items-center space-x-4 justify-center">
         <FormField
           control={control}
@@ -23,13 +26,13 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
           render={({ field }) => (
             <FormItem className="mt-6">
               <FormControl>
-                {Open1 && (
+               
                   <Input
                     placeholder="Degree"
                     {...field}
                     className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                   />
-                )}
+               
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -42,13 +45,13 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
           render={({ field }) => (
             <FormItem className="mt-6">
               <FormControl>
-                {Open1 && (
+                
                   <Input
                     placeholder="School Name"
                     {...field}
                     className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                   />
-                )}
+             
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -62,18 +65,23 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
         render={({ field }) => (
           <FormItem className="mt-2 w-1/2">
             <FormControl>
-              {Open1 && (
+              
                 <Input
                   placeholder="Year"
                   {...field}
                   className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                 />
-              )}
+            
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
+       <div className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer">
+            <Plus className="size-4" />
+            Add Education
+          </div>
+      </div>)}
     </div>
   );
 };
