@@ -1,7 +1,8 @@
 import { Input } from "../ui/input";
-import { Switch } from "@/components/ui/switch";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Plus } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useFieldArray } from "react-hook-form";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type WorkExperienceProps = {
   control: any;
@@ -10,6 +11,14 @@ type WorkExperienceProps = {
 };
 
 export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps) => {
+  const { fields, append } = useFieldArray({
+    control,
+    name: "workExperience",
+  });
+
+  const addNewexperience = () => {
+    append({ companyName: "", startDate: "", endDate: "", designation: "" });
+  };
   return (
     <div className="mt-5">
       <div className="flex items-center justify-between">
@@ -20,64 +29,89 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
       <hr />
       {Open2 && (
         <div>
-          <div className="grid grid-cols-2 items-center space-x-4 justify-center">
-            <FormField
-              control={control}
-              name="workExperience.companyName"
-              render={({ field }) => (
-                <FormItem className={`mt-6`}>
-                  <FormControl>
-                    <span className="flex items-center gap-1">
-                      <Input
-                        placeholder="Company Name"
-                        {...field}
-                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                      />
-                    </span>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {fields.map((experience, index: any) => (
+            <div key={experience.id} className="mb-4">
+              <div className="grid grid-cols-3 items-center space-x-4 justify-center">
+                <FormField
+                  control={control}
+                  name={`workExperience[${index}].designation`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-6`}>
+                      <FormControl>
+                        <span className="flex items-center gap-1">
+                          <Input
+                            placeholder="Designation"
+                            {...field}
+                            className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                          />
+                        </span>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={control}
-              name="workExperience.year"
-              render={({ field }) => (
-                <FormItem className={`mt-6`}>
-                  <FormControl>
-                    <span className="flex items-center gap-1">
-                      <Input
-                        placeholder="Year"
-                        {...field}
-                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                      />
-                    </span>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={control}
-            name="workExperience.designation"
-            render={({ field }) => (
-              <FormItem className={`mt-2`}>
-                <FormControl>
-                  <span className="flex items-center gap-1">
-                    <Input
-                      placeholder="Designation"
-                      {...field}
-                      className={`w-1/2 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                    />
-                  </span>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer">
+                <FormField
+                  control={control}
+                  name={`workExperience[${index}].startDate`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-6`}>
+                      <FormControl>
+                        <span className="flex items-center gap-1">
+                          <Input
+                            placeholder="Start Date"
+                            {...field}
+                            className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                          />
+                        </span>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name={`workExperience[${index}].endDate`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-6`}>
+                      <FormControl>
+                        <span className="flex items-center gap-1">
+                          <Input
+                            placeholder="End Date"
+                            {...field}
+                            className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                          />
+                        </span>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={control}
+                name={`workExperience[${index}].companyName`}
+                render={({ field }) => (
+                  <FormItem className={`mt-2`}>
+                    <FormControl>
+                      <span className="flex items-center gap-1">
+                        <Input
+                          placeholder="Company Name"
+                          {...field}
+                          className={`w-1/3 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                        />
+                      </span>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          ))}
+          <div
+            className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer"
+            onClick={addNewexperience}
+          >
             <Plus className="size-4" />
             Add Experience
           </div>

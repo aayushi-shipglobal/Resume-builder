@@ -35,32 +35,34 @@ const formSchema = z.object({
       .min(4, "Year is required")
       .regex(/^\d{4}$/, "Invalid Year format"),
     degree: z.string(),
+    cgpa: z.string().optional(),
   }),
-  projects: z.object({
+  projects:z.array(z.object({
     project: z.string().min(5, "Projects are required"),
+    link: z.string().optional(),
     description: z.string(),
-  }),
-  workExperience: z.object({
+  })) ,
+  workExperience: z.array(z.object({
     companyName: z.string().min(5, "Company Name is required"),
-    year: z
+
+    startDate: z
+      .string()
+      .min(4, "Year is required")
+      .regex(/^\d{4}$/, "Invalid Year format"),
+    endDate: z
       .string()
       .min(4, "Year is required")
       .regex(/^\d{4}$/, "Invalid Year format"),
     designation: z.string().min(3, "Designation is required"),
-  }),
+  })),
   awardsAchievements: z.string().optional(),
 });
 
 export default function Resume() {
   const [isOpen, setIsOpen] = useState(true);
-  const [link, setLink] = useState("");
   const skills = useSelector((state: any) => state.tasks.tasks);
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
-
-  const handleLinkChange = (e: any) => {
-    setLink(e.target.value);
-  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,73 +81,44 @@ export default function Resume() {
         year: "",
         degree: "",
       },
-      projects: {
-        project: "",
-        description: "",
-      },
-      workExperience: {
-        companyName: "",
-        year: "",
-        designation: "",
-      },
+      projects: [
+        {
+          project: "",
+          link: "",
+          description: "",
+        },
+      ],
+      workExperience: [
+        {
+          companyName: "",
+          startDate: "",
+          endDate: "",
+          designation: "",
+        },
+      ],
+
       awardsAchievements: "",
     },
   });
 
   const { watch } = form;
 
-  const name = watch("personalDetails.name");
   const summary = watch("personalDetails.summary");
   const workProfile = watch("personalDetails.workProfile");
-  const address = watch("personalDetails.address");
   const phone = watch("personalDetails.phone");
-  const email = watch("personalDetails.email");
-  const school = watch("education.school");
-  const year = watch("education.year");
-  const degree = watch("education.degree");
-  const project = watch("projects.project");
-  const description = watch("projects.description");
-  const companyName = watch("workExperience.companyName");
-  const yearWork = watch("workExperience.year");
-  const designation = watch("workExperience.designation");
-  const awardsAchievements = watch("awardsAchievements");
+  const projects = watch("projects");
+  const workExperience = watch("workExperience");
+  const showData = form.watch();
 
   useEffect(() => {
     console.log("Form Values Updated:");
     console.log({
-      name,
       summary,
       workProfile,
-      address,
       phone,
-      email,
-      school,
-      year,
-      degree,
-      project,
-      description,
-      companyName,
-      yearWork,
-      designation,
-      awardsAchievements,
+     
     });
-  }, [
-    name,
-    summary,
-    workProfile,
-    address,
-    phone,
-    email,
-    school,
-    year,
-    degree,
-    project,
-    description,
-    companyName,
-    yearWork,
-    designation,
-    awardsAchievements,
-  ]);
+  }, [summary, workProfile, phone]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
@@ -173,34 +146,66 @@ export default function Resume() {
             <div className="border border-gray-100 rounded-md p-6 bg-white">
               <TechnicalSkills />
               <EducationDetails control={form.control} onClick={handleToggle1} Open1={isOpen1} />
-              <ProjectDetails control={form.control} value={link} onChange={handleLinkChange} />
+              <ProjectDetails control={form.control} />
               <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
               <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
-              <Button type="submit" className="mt-2 bg-teal-600 text-white">
-                Submit
-              </Button>
+              <div className="flex justify-end">
+                <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                  Submit
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
       </div>
       <div className="w-3/5 mx-6 bg-white border border-gray-100 rounded-md py-6 shadow-2xl  shadow-black max-h-max">
-        <p className="font-bold text-3xl text-center mb-2"> {name && name.length > 0 ? name : "Your Name"} </p>
+        <p className="font-bold text-3xl text-center mb-2">
+          {" "}
+          {showData.personalDetails.name ? showData.personalDetails.name : "Your Name"}{" "}
+        </p>
         <div className="flex space-x-4 items-center justify-center text-gray-500 text-sm mb-2">
           <p className="flex items-center gap-1">
-            {address && address.length > 0 && (
+            {showData.personalDetails.address && (
               <span className="flex items-center gap-1">
                 <MapPin className="size-4" />
-                <span>{address}</span>
+                <span>{showData.personalDetails.address}</span>
               </span>
             )}
           </p>
 
-          <ResumeComponent Icon={Mail} title={email} placeholder="Email Address" />
-          <ResumeComponent Icon={Phone} title={phone} placeholder="Phone Number" />
+          <ResumeComponent Icon={Mail} title={showData.personalDetails.email} placeholder="Email Address" />
+          <ResumeComponent Icon={Phone} value="+91" title={phone} placeholder="Phone Number" />
         </div>
-        <div className="text-center font-bold text-lg my-1">
-          {workProfile && workProfile.length > 0 ? workProfile : "Work Profile"}
-        </div>
+        <div className="text-center font-bold text-lg my-1">{workProfile ? workProfile : "Work Profile"}</div>
+
+        {isOpen2 && (
+          <div className="mb-3">
+            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Work Experience</div>
+            {workExperience &&
+              workExperience.map((title, index) => (
+                <div key={index}>
+                  <div className="flex justify-between pt-2 text-base">
+                    <p className="pl-12">
+                      {title.designation ? title.designation : "Designation"}
+                    </p>
+                    <div>
+                      <i className="pl-11 pr-2 text-sm">
+                        {title.startDate ? title.startDate : "Start Date"}
+                      </i>
+                      <span>-</span>
+                      <i className="pl-2 pr-11 text-sm">
+                        {title.endDate ? title.endDate : "End Date"}
+                      </i>
+                    </div>
+                  </div>
+                  <i className="pl-14 text-sm">
+                    {title.companyName ? title.companyName : "Company Name"}
+                  </i>
+                </div>
+              ))}
+          </div>
+        )}
+
         <div>
           <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Technical Skills</div>
           <ul className="mx-6 my-3 cursor-pointer list-disc text-base">
@@ -215,39 +220,36 @@ export default function Resume() {
 
         <div>
           <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Projects</div>
-          <div className="flex items-center space-x-4">
-            <p className="pl-12 mt-2">{project && project.length > 0 ? project : "Project Title"}</p>
-            <Link to={link} className="underline text-indigo-800 pt-1">
-              Link
-            </Link>
-          </div>
+          {projects &&
+            projects.map((item, index) => (
+              <div key={index}>
+                <div className="flex items-center space-x-4">
+                  <p className="pl-12 mt-2">{item.project ? item.project : "Project Title"}</p>
+                  <Link to={item.link} className="underline text-indigo-800 pt-1">
+                    Link
+                  </Link>
+                </div>
 
-          <p className="pl-14 text-sm text-gray-600 mb-4">
-            {description && description.length > 0 ? description : "Project Description"}
-          </p>
+                <p className="pl-14 text-sm text-gray-600 mb-4">
+                  {item.description ? item.description : "Project Description"}
+                </p>
+              </div>
+            ))}
         </div>
 
         {isOpen1 && (
           <div>
             <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Education</div>
-            <div className="flex justify-between py-3">
-              <div className="flex space-x-2 items-center">
-                <p className="pl-12 py-1">{degree && degree.length > 0 ? degree : "Degree"}</p>
-                <span>|</span>
-                <p className="py-1">{school && school.length > 0 ? school : "School"}</p>
-              </div>
-              <i className="px-11 py-1">{year && year.length > 0 ? year : "year"}</i>
+            <div className="flex justify-between pt-3">
+              <p className="pl-12 pt-1">{showData.education.school ? showData.education.school : "School Name"}</p>
+
+              <i className="px-11 pt-1">{showData.education.year ? showData.education.year : "year"}</i>
             </div>
-          </div>
-        )}
-        {isOpen2 && (
-          <div className="mb-3">
-            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Work Experience</div>
-            <div className="flex justify-between pt-2 text-base">
-              <p className="pl-12">{companyName && companyName.length > 0 ? companyName : "Work Experience"}</p>
-              <i className="px-11">{yearWork && yearWork.length > 0 ? yearWork : "year"}</i>
+            <div className="flex items-center">
+              <p className="pl-16 pb-4 text-sm">{showData.education.degree ? showData.education.degree : "Degree"}</p>
+              <span className="pl-2 pb-4">|</span>
+              <p className="pl-2 pb-4 text-sm">{showData.education.cgpa ? showData.education.cgpa : "cgpa  "}</p>
             </div>
-            <i className="pl-16 text-sm">{designation && designation.length > 0 ? designation : "Designation"}</i>
           </div>
         )}
 
@@ -256,8 +258,8 @@ export default function Resume() {
             <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Awards and Achievements</div>
             <div className="flex justify-between pt-2 text-base">
               <p className="pl-14 text-sm text-gray-500">
-                {awardsAchievements && awardsAchievements.length > 0
-                  ? awardsAchievements
+                {showData.awardsAchievements
+                  ? showData.awardsAchievements
                   : "Share your key accomplishments and accolades here..."}
               </p>
             </div>
