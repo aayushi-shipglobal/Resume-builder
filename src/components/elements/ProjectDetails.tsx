@@ -5,20 +5,18 @@ import { Textarea } from "../ui/textarea";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type ProjectDetailsProps = {
-
   control: any;
 };
 
 export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
   const { fields, append } = useFieldArray({
-    control, 
-    name: "projects", 
+    control,
+    name: "projects",
   });
   const addNewProject = () => {
-    append({ project: "", link: "", description: "" }); 
+    append({ project: "",techStack:"", link: "", description: "" });
   };
 
-  
   return (
     <div>
       <div className="mt-6">
@@ -44,7 +42,22 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={control}
+              name={`projects[${index}].techStack`}
+              render={({ field }) => (
+                <FormItem className="mt-6">
+                  <FormControl>
+                    <Input
+                      placeholder="Tech Stack"
+                      {...field}
+                      className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={control}
               name={`projects[${index}].link`}
@@ -53,7 +66,6 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
                   <FormControl>
                     <Input
                       placeholder="Add Link..."
-                      
                       {...field}
                       className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                     />

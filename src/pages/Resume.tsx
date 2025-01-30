@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,33 +28,40 @@ const formSchema = z.object({
   category: z.string().optional(),
 
   technicalSkills: z.string().min(1, "At least one skill is required"),
-  education: z.object({
-    school: z.string().min(5, "School Name is required"),
-    year: z
-      .string()
-      .min(4, "Year is required")
-      .regex(/^\d{4}$/, "Invalid Year format"),
-    degree: z.string(),
-    cgpa: z.string().optional(),
-  }),
-  projects:z.array(z.object({
-    project: z.string().min(5, "Projects are required"),
-    link: z.string().optional(),
-    description: z.string(),
-  })) ,
-  workExperience: z.array(z.object({
-    companyName: z.string().min(5, "Company Name is required"),
+  education: z.array(
+    z.object({
+      school: z.string().min(5, "School Name is required"),
+      year: z
+        .string()
+        .min(4, "Year is required")
+        .regex(/^\d{4}$/, "Invalid Year format"),
+      degree: z.string(),
+      cgpa: z.string().optional(),
+    }),
+  ),
+  projects: z.array(
+    z.object({
+      project: z.string().min(5, "Projects are required"),
+      techStack:z.string(),
+      link: z.string().optional(),
+      description: z.string(),
+    }),
+  ),
+  workExperience: z.array(
+    z.object({
+      companyName: z.string().min(5, "Company Name is required"),
 
-    startDate: z
-      .string()
-      .min(4, "Year is required")
-      .regex(/^\d{4}$/, "Invalid Year format"),
-    endDate: z
-      .string()
-      .min(4, "Year is required")
-      .regex(/^\d{4}$/, "Invalid Year format"),
-    designation: z.string().min(3, "Designation is required"),
-  })),
+      startDate: z
+        .string()
+        .min(4, "Year is required")
+        .regex(/^\d{4}$/, "Invalid Year format"),
+      endDate: z
+        .string()
+        .min(4, "Year is required")
+        .regex(/^\d{4}$/, "Invalid Year format"),
+      designation: z.string().min(3, "Designation is required"),
+    }),
+  ),
   awardsAchievements: z.string().optional(),
 });
 
@@ -76,11 +83,11 @@ export default function Resume() {
         email: "",
       },
       technicalSkills: "",
-      education: {
+      education: [{
         school: "",
         year: "",
         degree: "",
-      },
+      },],
       projects: [
         {
           project: "",
@@ -103,22 +110,13 @@ export default function Resume() {
 
   const { watch } = form;
 
-  const summary = watch("personalDetails.summary");
+  // const summary = watch("personalDetails.summary");
   const workProfile = watch("personalDetails.workProfile");
   const phone = watch("personalDetails.phone");
   const projects = watch("projects");
   const workExperience = watch("workExperience");
+  const education = watch("education");
   const showData = form.watch();
-
-  useEffect(() => {
-    console.log("Form Values Updated:");
-    console.log({
-      summary,
-      workProfile,
-      phone,
-     
-    });
-  }, [summary, workProfile, phone]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
@@ -185,22 +183,14 @@ export default function Resume() {
               workExperience.map((title, index) => (
                 <div key={index}>
                   <div className="flex justify-between pt-2 text-base">
-                    <p className="pl-12">
-                      {title.designation ? title.designation : "Designation"}
-                    </p>
+                    <p className="pl-12">{title.designation ? title.designation : "Designation"}</p>
                     <div>
-                      <i className="pl-11 pr-2 text-sm">
-                        {title.startDate ? title.startDate : "Start Date"}
-                      </i>
+                      <i className="pl-11 pr-2 text-sm">{title.startDate ? title.startDate : "Start Date"}</i>
                       <span>-</span>
-                      <i className="pl-2 pr-11 text-sm">
-                        {title.endDate ? title.endDate : "End Date"}
-                      </i>
+                      <i className="pl-2 pr-11 text-sm">{title.endDate ? title.endDate : "End Date"}</i>
                     </div>
                   </div>
-                  <i className="pl-14 text-sm">
-                    {title.companyName ? title.companyName : "Company Name"}
-                  </i>
+                  <i className="pl-14 text-sm">{title.companyName ? title.companyName : "Company Name"}</i>
                 </div>
               ))}
           </div>
@@ -223,8 +213,11 @@ export default function Resume() {
           {projects &&
             projects.map((item, index) => (
               <div key={index}>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
                   <p className="pl-12 mt-2">{item.project ? item.project : "Project Title"}</p>
+                  <span>|</span>
+                  <p className="mt-2">{item.techStack ? item.techStack : "Tech Stack"}</p>
+                  <span>|</span>
                   <Link to={item.link} className="underline text-indigo-800 pt-1">
                     Link
                   </Link>
@@ -240,16 +233,21 @@ export default function Resume() {
         {isOpen1 && (
           <div>
             <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Education</div>
-            <div className="flex justify-between pt-3">
-              <p className="pl-12 pt-1">{showData.education.school ? showData.education.school : "School Name"}</p>
+            {education &&
+              education.map((text, index) => (
+                <div key={index}>
+                  <div className="flex justify-between pt-3">
+                    <p className="pl-12 pt-1">{text.school ? text.school : "School Name"}</p>
 
-              <i className="px-11 pt-1">{showData.education.year ? showData.education.year : "year"}</i>
-            </div>
-            <div className="flex items-center">
-              <p className="pl-16 pb-4 text-sm">{showData.education.degree ? showData.education.degree : "Degree"}</p>
-              <span className="pl-2 pb-4">|</span>
-              <p className="pl-2 pb-4 text-sm">{showData.education.cgpa ? showData.education.cgpa : "cgpa  "}</p>
-            </div>
+                    <i className="px-11 pt-1">{text.year ? text.year : "year"}</i>
+                  </div>
+                  <div className="flex items-center">
+                    <p className="pl-16 pb-4 text-sm">{text.degree ? text.degree : "Degree"}</p>
+                    <span className="pl-2 pb-4">|</span>
+                    <p className="pl-2 pb-4 text-sm">{text.cgpa ? text.cgpa : "cgpa  "}</p>
+                  </div>
+                </div>
+              ))}
           </div>
         )}
 

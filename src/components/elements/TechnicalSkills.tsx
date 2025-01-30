@@ -79,7 +79,11 @@ export const TechnicalSkills = () => {
           />
 
           <div className="flex justify-end">
-            <Plus onClick={handleAddSkill} className="pt-5 size-9 -ml-9 font-bold -my-12" type="button" />
+            <Plus
+              onClick={handleAddSkill}
+              className={`pt-5 size-9 -ml-9 font-bold -my-12 ${inputSkill.length > 0 ? "" : "hidden"}`}
+              type="button"
+            />
           </div>
         </div>
       </div>
