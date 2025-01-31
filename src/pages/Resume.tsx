@@ -44,7 +44,7 @@ const formSchema = z.object({
       project: z.string().min(5, "Projects are required"),
       techStack: z.string(),
       link: z.string().optional(),
-      description:z.array( z.string()),
+      description: z.array(z.string()),
     }),
   ),
   workExperience: z.array(
@@ -65,7 +65,7 @@ const formSchema = z.object({
   awardsAchievements: z.array(
     z.object({
       title: z.string(),
-      description: z.string(),
+      descriptions: z.string(),
     }),
   ),
 });
@@ -114,7 +114,7 @@ export default function Resume() {
       awardsAchievements: [
         {
           title: "",
-          description: "",
+          descriptions: "",
         },
       ],
     },
@@ -165,7 +165,7 @@ export default function Resume() {
                   Submit
                 </Button>
               </div>
-            </div>              
+            </div>
           </form>
         </Form>
       </div>
@@ -237,7 +237,12 @@ export default function Resume() {
                 </div>
 
                 <p className="pl-14 text-sm text-gray-600 mb-4 leading-5 mt-2">
-                  {item.description ? item.description : "Project Description"}
+                  {item.description &&
+                    item.description.map((desc, index) => (
+                      <div key={index} className="mb-2">
+                        {desc || "Description"}
+                      </div>
+                    ))}
                 </p>
               </div>
             ))}
@@ -273,7 +278,9 @@ export default function Resume() {
                   <li className="pl-14 text-sm">
                     {items.title ? items.title : "Share your key accomplishments and accolades here..."}
                   </li>
-                  <p className="pl-20 text-sm text-gray-500 break-words">{items.description ? items.description : "Description"}</p>
+                  <p className="pl-20 text-sm text-gray-500 break-words">
+                    {items.descriptions ? items.descriptions : "Description"}
+                  </p>
                 </div>
               ))}
           </div>

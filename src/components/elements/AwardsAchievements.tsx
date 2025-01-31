@@ -51,7 +51,7 @@ export const AwardsAchievements = ({ control, onClick, Open }: AwardsAchievement
               />
               <FormField
                 control={control}
-                name={`awardsAchievements[${index}].description`}
+                name={`awardsAchievements[${index}].descriptions`}
                 render={({ field }) => (
                   <FormItem className={`w-full`}>
                     <FormControl>

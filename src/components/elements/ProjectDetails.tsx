@@ -17,7 +17,7 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
     const updatedProjects = [...fields];
     updatedProjects[index] = {
       ...updatedProjects[index],
-      description: [...(updatedProjects[index].description || []), ""], 
+      description: [...(updatedProjects[index].description || []), ""],
     };
     update(index, updatedProjects[index]);
   };
@@ -28,7 +28,7 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
         <FormLabel className="text-md md:text-xl font-bold dark:text-white">Projects</FormLabel>
         <hr />
       </div>
-      
+
       {fields.map((project, index) => (
         <div key={project.id} className="mb-2">
           <div className="grid grid-cols-2 items-center space-x-2">
@@ -85,25 +85,26 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
           />
 
           <div className="flex items-center gap-x-1">
-            {(project.description || []).map((_, descIndex) => (
-              <FormField
-                key={descIndex}
-                control={control}
-                name={`projects[${index}].description[${descIndex}]`}
-                render={({ field }) => (
-                  <FormItem className={`mt-2 w-full`}>
-                    <FormControl>
-                      <Input
-                        placeholder="Description"
-                        {...field}
-                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+            {(project.description).map((_: any, descIndex: number) => (
+              
+                <FormField
+                  control={control}
+                  name={`projects[${index}].description[${descIndex}]`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-2 w-full`}>
+                      <FormControl  className="flex flex-row">
+                        <Input
+                          placeholder="Description"
+                          {...field}
+                          className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+            
             ))}
-         
+
             <div
               className="p-2 bg-teal-500 rounded-md text-white mt-2 cursor-pointer"
               onClick={() => addDescription(index)}
@@ -114,7 +115,6 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
         </div>
       ))}
 
-    
       <div
         className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer"
         onClick={() => append({ project: "", techStack: "", link: "", description: [""] })}
