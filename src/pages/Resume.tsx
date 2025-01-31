@@ -42,9 +42,9 @@ const formSchema = z.object({
   projects: z.array(
     z.object({
       project: z.string().min(5, "Projects are required"),
-      techStack:z.string(),
+      techStack: z.string(),
       link: z.string().optional(),
-      description: z.string(),
+      description:z.array( z.string()),
     }),
   ),
   workExperience: z.array(
@@ -62,7 +62,12 @@ const formSchema = z.object({
       designation: z.string().min(3, "Designation is required"),
     }),
   ),
-  awardsAchievements: z.string().optional(),
+  awardsAchievements: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+    }),
+  ),
 });
 
 export default function Resume() {
@@ -83,16 +88,18 @@ export default function Resume() {
         email: "",
       },
       technicalSkills: "",
-      education: [{
-        school: "",
-        year: "",
-        degree: "",
-      },],
+      education: [
+        {
+          school: "",
+          year: "",
+          degree: "",
+        },
+      ],
       projects: [
         {
           project: "",
           link: "",
-          description: "",
+          description: [""],
         },
       ],
       workExperience: [
@@ -104,7 +111,12 @@ export default function Resume() {
         },
       ],
 
-      awardsAchievements: "",
+      awardsAchievements: [
+        {
+          title: "",
+          description: "",
+        },
+      ],
     },
   });
 
@@ -116,6 +128,7 @@ export default function Resume() {
   const projects = watch("projects");
   const workExperience = watch("workExperience");
   const education = watch("education");
+  const awardsAchievements = watch("awardsAchievements");
   const showData = form.watch();
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -136,7 +149,7 @@ export default function Resume() {
 
   return (
     <div className="m-0 px-8 py-5 dark:bg-gray-900 flex flex-col lg:flex lg:flex-row space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
-      <div className="rounded-md w-2/5 h-600 overflow-y-auto">
+      <div className="rounded-md w-2/5 h-600 overflow-y-auto px-2">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <PersonalDetailsForm control={form.control} />
@@ -152,7 +165,7 @@ export default function Resume() {
                   Submit
                 </Button>
               </div>
-            </div>
+            </div>              
           </form>
         </Form>
       </div>
@@ -223,7 +236,7 @@ export default function Resume() {
                   </Link>
                 </div>
 
-                <p className="pl-14 text-sm text-gray-600 mb-4">
+                <p className="pl-14 text-sm text-gray-600 mb-4 leading-5 mt-2">
                   {item.description ? item.description : "Project Description"}
                 </p>
               </div>
@@ -242,9 +255,9 @@ export default function Resume() {
                     <i className="px-11 pt-1">{text.year ? text.year : "year"}</i>
                   </div>
                   <div className="flex items-center">
-                    <p className="pl-16 pb-4 text-sm">{text.degree ? text.degree : "Degree"}</p>
-                    <span className="pl-2 pb-4">|</span>
-                    <p className="pl-2 pb-4 text-sm">{text.cgpa ? text.cgpa : "cgpa  "}</p>
+                    <p className="pl-16 pb-2 text-sm">{text.degree ? text.degree : "Degree"}</p>
+                    <span className="pl-2 pb-2">|</span>
+                    <p className="pl-2 pb-2 text-sm">{text.cgpa ? text.cgpa : "cgpa  "}</p>
                   </div>
                 </div>
               ))}
@@ -254,13 +267,15 @@ export default function Resume() {
         {isOpen && (
           <div>
             <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Awards and Achievements</div>
-            <div className="flex justify-between pt-2 text-base">
-              <p className="pl-14 text-sm text-gray-500">
-                {showData.awardsAchievements
-                  ? showData.awardsAchievements
-                  : "Share your key accomplishments and accolades here..."}
-              </p>
-            </div>
+            {awardsAchievements &&
+              awardsAchievements.map((items, index) => (
+                <div key={index} className="pt-2 text-base flex flex-col flex-wrap">
+                  <li className="pl-14 text-sm">
+                    {items.title ? items.title : "Share your key accomplishments and accolades here..."}
+                  </li>
+                  <p className="pl-20 text-sm text-gray-500 break-words">{items.description ? items.description : "Description"}</p>
+                </div>
+              ))}
           </div>
         )}
       </div>

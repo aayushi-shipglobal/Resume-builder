@@ -29,8 +29,8 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
       <hr />
       {Open1 && (
         <div>
-          {fields.map((education, index: any) => (
-            <div key={education.id} className="mb-4">
+          {fields.map((education, index) => (
+            <div key={education.id} className="mb-2">
               <div className="grid grid-cols-2 items-center space-x-4 justify-center">
                 <FormField
                   control={control}
@@ -65,11 +65,11 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
                   )}
                 />
               </div>
-              <FormField
+              <div className="grid grid-cols-2 items-center space-x-4 justify-center"><FormField
                 control={control}
                 name={`education[${index}].cgpa`}
                 render={({ field }) => (
-                  <FormItem className="mt-2 w-1/2">
+                  <FormItem className="mt-2">
                     <FormControl>
                       <Input
                         placeholder="CGPA / Percentage"
@@ -86,7 +86,7 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
                 control={control}
                 name={`education[${index}].year`}
                 render={({ field }) => (
-                  <FormItem className="mt-2 w-1/2">
+                  <FormItem className="mt-2">
                     <FormControl>
                       <Input
                         placeholder="Year"
@@ -97,7 +97,8 @@ export const EducationDetails = ({ control, onClick, Open1 }: EducationDetailsPr
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /></div>
+              
             </div>
           ))}
           <div

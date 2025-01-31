@@ -102,7 +102,7 @@ export const TechnicalSkills = () => {
         </ul>
       )}
 
-      <ul className="flex flex-row gap-x-2 cursor-pointer">
+      <ul className="flex flex-wrap gap-x-2 cursor-pointer">
         {skills.map((skill: Skill) => (
           <li
             key={skill.id}

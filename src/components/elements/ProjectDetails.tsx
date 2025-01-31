@@ -1,7 +1,6 @@
 import { Plus } from "lucide-react";
 import { Input } from "../ui/input";
 import { useFieldArray } from "react-hook-form";
-import { Textarea } from "../ui/textarea";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type ProjectDetailsProps = {
@@ -9,12 +8,18 @@ type ProjectDetailsProps = {
 };
 
 export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
-  const { fields, append } = useFieldArray({
+  const { fields, append, update } = useFieldArray({
     control,
     name: "projects",
   });
-  const addNewProject = () => {
-    append({ project: "",techStack:"", link: "", description: "" });
+
+  const addDescription = (index: number) => {
+    const updatedProjects = [...fields];
+    updatedProjects[index] = {
+      ...updatedProjects[index],
+      description: [...(updatedProjects[index].description || []), ""], 
+    };
+    update(index, updatedProjects[index]);
   };
 
   return (
@@ -23,8 +28,9 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
         <FormLabel className="text-md md:text-xl font-bold dark:text-white">Projects</FormLabel>
         <hr />
       </div>
+      
       {fields.map((project, index) => (
-        <div key={project.id} className="mb-4">
+        <div key={project.id} className="mb-2">
           <div className="grid grid-cols-2 items-center space-x-2">
             <FormField
               control={control}
@@ -42,22 +48,7 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={control}
-              name={`projects[${index}].techStack`}
-              render={({ field }) => (
-                <FormItem className="mt-6">
-                  <FormControl>
-                    <Input
-                      placeholder="Tech Stack"
-                      {...field}
-                      className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={control}
               name={`projects[${index}].link`}
@@ -78,28 +69,58 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
 
           <FormField
             control={control}
-            name={`projects[${index}].description`}
+            name={`projects[${index}].techStack`}
             render={({ field }) => (
-              <FormItem className={`mt-2`}>
+              <FormItem className="mt-2 w-96">
                 <FormControl>
-                  <Textarea
-                    placeholder="Description"
+                  <Input
+                    placeholder="Tech Stack"
                     {...field}
-                    className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                    className="shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500"
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
+
+          <div className="flex items-center gap-x-1">
+            {(project.description || []).map((_, descIndex) => (
+              <FormField
+                key={descIndex}
+                control={control}
+                name={`projects[${index}].description[${descIndex}]`}
+                render={({ field }) => (
+                  <FormItem className={`mt-2 w-full`}>
+                    <FormControl>
+                      <Input
+                        placeholder="Description"
+                        {...field}
+                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
+         
+            <div
+              className="p-2 bg-teal-500 rounded-md text-white mt-2 cursor-pointer"
+              onClick={() => addDescription(index)}
+            >
+              <Plus className="size-4" />
+            </div>
+          </div>
         </div>
       ))}
 
+    
       <div
         className="text-sm underline text-teal-700 font-bold mt-3 flex items-center cursor-pointer"
-        onClick={addNewProject}
+        onClick={() => append({ project: "", techStack: "", link: "", description: [""] })}
       >
         <Plus className="size-4" />
-        Add Projects
+        Add New Project
       </div>
     </div>
   );

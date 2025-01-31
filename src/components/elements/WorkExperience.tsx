@@ -17,7 +17,7 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
   });
 
   const addNewexperience = () => {
-    append({ companyName: "", startDate: "", endDate: "", designation: "" });
+    append({ companyName: "", startDate: "", endDate: "", designation: "",link:"" });
   };
   return (
     <div className="mt-5">
@@ -29,18 +29,18 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
       <hr />
       {Open2 && (
         <div>
-          {fields.map((experience, index: any) => (
-            <div key={experience.id} className="mb-4">
-              <div className="grid grid-cols-3 items-center space-x-4 justify-center">
-                <FormField
+          {fields.map((experience, index) => (
+            <div key={experience.id} className="mb-2">
+              <div className="grid grid-cols-2 items-center space-x-4 justify-center">
+              <FormField
                   control={control}
-                  name={`workExperience[${index}].designation`}
+                  name={`workExperience[${index}].link`}
                   render={({ field }) => (
                     <FormItem className={`mt-6`}>
                       <FormControl>
                         <span className="flex items-center gap-1">
                           <Input
-                            placeholder="Designation"
+                            placeholder="Add Link"
                             {...field}
                             className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
                           />
@@ -53,9 +53,29 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
 
                 <FormField
                   control={control}
-                  name={`workExperience[${index}].startDate`}
+                  name={`workExperience[${index}].companyName`}
                   render={({ field }) => (
                     <FormItem className={`mt-6`}>
+                      <FormControl>
+                        <span className="flex items-center gap-1">
+                          <Input
+                            placeholder="Company Name"
+                            {...field}
+                            className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                          />
+                        </span>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 items-center space-x-4 justify-center">
+                <FormField
+                  control={control}
+                  name={`workExperience[${index}].startDate`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-2`}>
                       <FormControl>
                         <span className="flex items-center gap-1">
                           <Input
@@ -73,7 +93,7 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
                   control={control}
                   name={`workExperience[${index}].endDate`}
                   render={({ field }) => (
-                    <FormItem className={`mt-6`}>
+                    <FormItem className={`mt-2`}>
                       <FormControl>
                         <span className="flex items-center gap-1">
                           <Input
@@ -89,23 +109,23 @@ export const WorkExperience = ({ control, onClick, Open2 }: WorkExperienceProps)
                 />
               </div>
               <FormField
-                control={control}
-                name={`workExperience[${index}].companyName`}
-                render={({ field }) => (
-                  <FormItem className={`mt-2`}>
-                    <FormControl>
-                      <span className="flex items-center gap-1">
-                        <Input
-                          placeholder="Company Name"
-                          {...field}
-                          className={`w-1/3 shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                        />
-                      </span>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  control={control}
+                  name={`workExperience[${index}].designation`}
+                  render={({ field }) => (
+                    <FormItem className={`mt-2`}>
+                      <FormControl>
+                        <span className="flex items-center gap-1">
+                          <Input
+                            placeholder="Designation"
+                            {...field}
+                            className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                          />
+                        </span>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </div>
           ))}
           <div
