@@ -161,9 +161,9 @@ export default function Resume() {
               <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
               <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
               <div className="flex justify-end">
-                <Button type="submit" className="mt-2 bg-teal-600 text-white">
-                  Submit
-                </Button>
+                  <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                    Submit
+                  </Button>
               </div>
             </div>
           </form>
