@@ -12,6 +12,7 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        'custom-gray':'rgb(210, 228, 225)',
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -53,6 +54,7 @@ export default {
       },
       spacing: {
         100: "25rem",
+        600:"600px"
       },
     },
   },
