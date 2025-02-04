@@ -15,11 +15,12 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
 
   const addDescription = (index: number) => {
     const updatedProjects = [...fields];
-    updatedProjects[index] = {
-      ...updatedProjects[index],
-      description: [...(updatedProjects[index].description || []), ""],
-    };
-    update(index, updatedProjects[index]);
+    console.log(updatedProjects, "updatedProjects");
+    // updatedProjects[index] = {
+    //   ...updatedProjects[index],
+    //   description: [...(updatedProjects[index].description || []), ""],
+    // };
+    // update(index, updatedProjects[index]);
   };
 
   return (
@@ -85,24 +86,22 @@ export const ProjectDetails = ({ control }: ProjectDetailsProps) => {
           />
 
           <div className="flex items-center gap-x-1">
-            {(project.description).map((_: any, descIndex: number) => (
-              
-                <FormField
-                  control={control}
-                  name={`projects[${index}].description[${descIndex}]`}
-                  render={({ field }) => (
-                    <FormItem className={`mt-2 w-full`}>
-                      <FormControl  className="flex flex-row">
-                        <Input
-                          placeholder="Description"
-                          {...field}
-                          className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-            
+            {project.description.map((_: any, descIndex: number) => (
+              <FormField
+                control={control}
+                name={`projects[${index}].description[${descIndex}]`}
+                render={({ field }) => (
+                  <FormItem className={`mt-2 w-full`}>
+                    <FormControl className="flex flex-row">
+                      <Input
+                        placeholder="Description"
+                        {...field}
+                        className={`shadow-sm focus-visible:ring-1 focus-visible:ring-blue-500`}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             ))}
 
             <div

@@ -121,7 +121,7 @@ export default function Resume() {
   });
 
   const { watch } = form;
-
+  console.log(watch("projects"));
   // const summary = watch("personalDetails.summary");
   const workProfile = watch("personalDetails.workProfile");
   const phone = watch("personalDetails.phone");
@@ -148,8 +148,8 @@ export default function Resume() {
   };
 
   return (
-    <div className="m-0 px-8 py-5 dark:bg-gray-900 flex flex-col lg:flex lg:flex-row space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
-      <div className="rounded-md w-2/5 h-600 overflow-y-auto px-2">
+    <div className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
+      <div className="rounded-md lg:w-2/5 h-600 overflow-y-auto px-2">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <PersonalDetailsForm control={form.control} />
@@ -161,17 +161,16 @@ export default function Resume() {
               <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
               <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
               <div className="flex justify-end">
-                  <Button type="submit" className="mt-2 bg-teal-600 text-white">
-                    Submit
-                  </Button>
+                <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                  Submit
+                </Button>
               </div>
             </div>
           </form>
         </Form>
       </div>
-      <div className="w-3/5 mx-6 bg-white border border-gray-100 rounded-md py-6 shadow-2xl  shadow-black max-h-max">
+      <div className="lg:w-3/5 bg-white text-gray-600 rounded-md py-6 shadow-2xl shadow-black max-h-max">
         <p className="font-bold text-3xl text-center mb-2">
-          {" "}
           {showData.personalDetails.name ? showData.personalDetails.name : "Your Name"}{" "}
         </p>
         <div className="flex space-x-4 items-center justify-center text-gray-500 text-sm mb-2">
@@ -187,47 +186,47 @@ export default function Resume() {
           <ResumeComponent Icon={Mail} title={showData.personalDetails.email} placeholder="Email Address" />
           <ResumeComponent Icon={Phone} value="+91" title={phone} placeholder="Phone Number" />
         </div>
-        <div className="text-center font-bold text-lg my-1">{workProfile ? workProfile : "Work Profile"}</div>
+        <div className="text-center font-bold text-lg my-2">{workProfile ? workProfile : "Work Profile"}</div>
 
         {isOpen2 && (
-          <div className="mb-3">
-            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Work Experience</div>
+          <div className="mb-3 border-t-2 border-gray-400 mx-12">
+            <div className="font-bold text-lg pl-3 px-2 py-1">Work Experience</div>
             {workExperience &&
               workExperience.map((title, index) => (
                 <div key={index}>
-                  <div className="flex justify-between pt-2 text-base">
-                    <p className="pl-12">{title.designation ? title.designation : "Designation"}</p>
+                  <div className="flex justify-between  text-base">
+                    <p className="pl-6">{title.designation ? title.designation : "Designation"}</p>
                     <div>
-                      <i className="pl-11 pr-2 text-sm">{title.startDate ? title.startDate : "Start Date"}</i>
+                      <i className="pl-4 pr-2 text-sm">{title.startDate ? title.startDate : "Start Date"}</i>
                       <span>-</span>
-                      <i className="pl-2 pr-11 text-sm">{title.endDate ? title.endDate : "End Date"}</i>
+                      <i className="pl-2 pr-4 text-sm">{title.endDate ? title.endDate : "End Date"}</i>
                     </div>
                   </div>
-                  <i className="pl-14 text-sm">{title.companyName ? title.companyName : "Company Name"}</i>
+                  <i className="pl-8 text-sm">{title.companyName ? title.companyName : "Company Name"}</i>
                 </div>
               ))}
           </div>
         )}
 
-        <div>
-          <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Technical Skills</div>
-          <ul className="mx-6 my-3 cursor-pointer list-disc text-base">
-            {skills.length == 0 && <span className="pl-6">Add your skills here</span>}
+        <div className="mb-3 border-t-2 border-gray-400 mx-12">
+          <div className="font-bold text-lg pl-3 px-2 py-1">Technical Skills</div>
+          <ul className="mx-6  cursor-pointer list-disc text-base pl-3">
+            {skills.length == 0 && <span className="pl-3">Add your skills here</span>}
             {skills.map((skill: Skill) => (
               <li key={skill.id}>
-                <span className="pl-2">{skill.text}</span>
+                <span className="">{skill.text}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div>
-          <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Projects</div>
+        <div className="mb-3 border-t-2 border-gray-400 mx-12">
+          <div className="font-bold text-lg pl-3 px-2 py-1">Projects</div>
           {projects &&
             projects.map((item, index) => (
               <div key={index}>
                 <div className="flex items-center space-x-2">
-                  <p className="pl-12 mt-2">{item.project ? item.project : "Project Title"}</p>
+                  <p className="pl-6 mt-2">{item.project ? item.project : "Project Title"}</p>
                   <span>|</span>
                   <p className="mt-2">{item.techStack ? item.techStack : "Tech Stack"}</p>
                   <span>|</span>
@@ -236,12 +235,12 @@ export default function Resume() {
                   </Link>
                 </div>
 
-                <p className="pl-14 text-sm text-gray-600 mb-4 leading-5 mt-2">
+                <p className="pl-6 text-sm text-gray-600 leading-5">
                   {item.description &&
                     item.description.map((desc, index) => (
-                      <div key={index} className="mb-2">
+                      <li key={index} className="">
                         {desc || "Description"}
-                      </div>
+                      </li>
                     ))}
                 </p>
               </div>
@@ -249,18 +248,18 @@ export default function Resume() {
         </div>
 
         {isOpen1 && (
-          <div>
-            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Education</div>
+          <div className="mb-3 border-t-2 border-gray-400 mx-12">
+            <div className="font-bold text-lg pl-4 py-1">Education</div>
             {education &&
               education.map((text, index) => (
                 <div key={index}>
-                  <div className="flex justify-between pt-3">
-                    <p className="pl-12 pt-1">{text.school ? text.school : "School Name"}</p>
+                  <div className="flex justify-between">
+                    <p className="pl-6 pt-1">{text.school ? text.school : "School Name"}</p>
 
-                    <i className="px-11 pt-1">{text.year ? text.year : "year"}</i>
+                    <i className="px-4 pt-1">{text.year ? text.year : "year"}</i>
                   </div>
                   <div className="flex items-center">
-                    <p className="pl-16 pb-2 text-sm">{text.degree ? text.degree : "Degree"}</p>
+                    <p className="pl-10 pb-2 text-sm">{text.degree ? text.degree : "Degree"}</p>
                     <span className="pl-2 pb-2">|</span>
                     <p className="pl-2 pb-2 text-sm">{text.cgpa ? text.cgpa : "cgpa  "}</p>
                   </div>
@@ -270,15 +269,15 @@ export default function Resume() {
         )}
 
         {isOpen && (
-          <div>
-            <div className="font-bold text-lg pl-9 px-2 py-1 bg-custom-gray ">Awards and Achievements</div>
+          <div className="mb-3 border-t-2 border-gray-400 mx-12">
+            <div className="font-bold text-lg pl-4 px-2 py-1">Awards and Achievements</div>
             {awardsAchievements &&
               awardsAchievements.map((items, index) => (
-                <div key={index} className="pt-2 text-base flex flex-col flex-wrap">
-                  <li className="pl-14 text-sm">
+                <div key={index} className="pt-1 text-base flex flex-col flex-wrap">
+                  <li className="pl-6 text-sm">
                     {items.title ? items.title : "Share your key accomplishments and accolades here..."}
                   </li>
-                  <p className="pl-20 text-sm text-gray-500 break-words">
+                  <p className="pl-12 text-sm text-gray-500 break-words">
                     {items.descriptions ? items.descriptions : "Description"}
                   </p>
                 </div>
