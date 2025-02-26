@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,7 @@ import { EducationDetails } from "@/components/elements/EducationDetails";
 import { WorkExperience } from "@/components/elements/WorkExperience";
 import { AwardsAchievements } from "@/components/elements/AwardsAchievements";
 import { TechnicalSkills } from "@/components/elements/TechnicalSkills";
+import jsPDF from "jspdf";
 
 const formSchema = z.object({
   personalDetails: z.object({
@@ -72,6 +73,7 @@ const formSchema = z.object({
 
 export default function Resume3() {
   const [isOpen, setIsOpen] = useState(true);
+  const resumeRef = useRef<HTMLDivElement>(null);
   const skills = useSelector((state: any) => state.tasks.tasks);
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
@@ -159,6 +161,22 @@ export default function Resume3() {
   const handleToggle2 = () => {
     setIsOpen2(!isOpen2);
   };
+  const handleDownloadPDF = () => {
+    setTimeout(() => {
+      const doc = new jsPDF();
+      if (resumeRef.current) {
+        doc.html(resumeRef.current, {
+          callback: (doc) => {
+            doc.save("resume.pdf");
+          },
+          x: 15,
+          y: 15,
+          width: 290,
+          windowWidth: 850,
+        });
+      }
+    }, 500);
+  };
 
   return (
     <div className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
@@ -174,7 +192,7 @@ export default function Resume3() {
               <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
               <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
               <div className="flex justify-end">
-                <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                <Button type="button" className="mt-2 bg-teal-600 text-white" onClick={handleDownloadPDF}>
                   Submit
                 </Button>
               </div>
@@ -182,7 +200,7 @@ export default function Resume3() {
           </form>
         </Form>
       </div>
-      <div className="lg:w-3/5">
+      <div ref={resumeRef} className="lg:w-3/5">
         <div className=" bg-white text-black rounded-md pb-6 shadow-2xl shadow-black max-h-max">
           <div className={`flex justify-between items-center px-9 py-6 ${currentColor.bg} text-white`}>
             <div>
@@ -219,7 +237,7 @@ export default function Resume3() {
                 {" "}
                 {workExperience &&
                   workExperience.map((title, index) => (
-                    <div key={index} className="grid grid-cols-2  py-2 w-full">
+                    <div key={index} className="grid grid-cols-2 py-2 w-full">
                       <div className="grid justify-start">
                         <p className="text-base">{title.designation ? title.designation : "Designation"}</p>
                         <i className="ml-3 text-sm">{title.companyName ? title.companyName : "Company Name"}</i>

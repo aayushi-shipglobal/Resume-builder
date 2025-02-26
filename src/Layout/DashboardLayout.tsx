@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import logo from "../assets/resume-icon.jpg";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, X, Menu, House, Users } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { signOut } from "firebase/auth";
+import { auth } from "@/integration/firebase";
+import { Footer } from "@/pages/Footer";
 
 export const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const token = sessionStorage.getItem("token");
+  const navigate = useNavigate();
 
   const buttonStyle = "h-4 pl-2 dark:text-white";
 
@@ -22,7 +27,17 @@ export const DashboardLayout = () => {
     }
     setDarkMode(!darkMode);
   };
+  const handleLogout = async () => {
+    try {
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+      await signOut(auth);
+      navigate("/login");
 
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
+  };
   return (
     <div id="toggle" className=" dark:bg-gray-900 max-w-full max-h-full">
       <div
@@ -30,12 +45,25 @@ export const DashboardLayout = () => {
       >
         <img src={logo} className="h-9 cursor-pointer" />
         <div className="hidden md:flex md:gap-4 md:items-center md:text-sm mr-4 cursor-pointer text-black dark:text-white">
-          <Link to="home" className="hover:text-blue-700">
+          <Link to="/" className="hover:text-blue-700">
             Home
           </Link>
           <Link to="about" className="hover:text-blue-700">
             About
           </Link>
+          {!token && (
+            <Button className="bg-teal-600">
+              <Link to="login" className="hover:text-blue-700">
+                Login
+              </Link>
+            </Button>
+          )}
+          {token && (
+            <p className="hover:underline" onClick={handleLogout}>
+              Logout
+            </p>
+          )}
+
           {!darkMode ? (
             <Moon onClick={toggleDarkMode} className={`${buttonStyle}`} />
           ) : (
@@ -73,7 +101,9 @@ export const DashboardLayout = () => {
       </div>
       <div className="mt-14 2xl:mx-64">
         <Outlet />
+        {/* <SignUp/> */}
       </div>
+      <Footer/>
     </div>
   );
 };

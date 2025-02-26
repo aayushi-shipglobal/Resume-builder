@@ -15,7 +15,7 @@ export default function Template() {
         <Temp temp={temp1} path="/home/resume"/>
         <Temp temp={temp2} path="/home/resume2"/>
         <Temp temp={temp3} path="/home/resume3"/>
-        <Temp temp={temp4} path="/home/resume"/>
+        <Temp temp={temp4} path="/home/resume4"/>
       </div>
     </div>
   );

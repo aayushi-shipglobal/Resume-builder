@@ -5,6 +5,9 @@ import Template from "@/pages/Template";
 import { DashboardLayout } from "@/Layout/DashboardLayout";
 import Resume2 from "@/pages/Resume2";
 import Resume3 from "@/pages/Resume3";
+import Resume4 from "@/pages/Resume4";
+import { SignUp } from "@/pages/SignUp";
+import { Login } from "@/pages/Login";
 
 export default function Routes() {
   return {
@@ -14,6 +17,14 @@ export default function Routes() {
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "login/signup",
+        element: <SignUp />,
+      },
+      {
+        path: "login",
+        element: <Login />,
       },
       {
         path: "home",
@@ -30,6 +41,10 @@ export default function Routes() {
       {
         path: "/home/resume3",
         element:<Resume3/>
+      },
+      {
+        path: "/home/resume4",
+        element:<Resume4/>
       },
       {
         path: "about",
