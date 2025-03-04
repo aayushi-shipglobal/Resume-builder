@@ -19,7 +19,7 @@ export default function Routes() {
         element: <Home />,
       },
       {
-        path: "login/signup",
+        path: "signup",
         element: <SignUp />,
       },
       {

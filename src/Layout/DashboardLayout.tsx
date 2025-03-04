@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import logo from "../assets/resume-icon.jpg";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, X, Menu, House, Users } from "lucide-react";
+import { Moon, Sun, X, Menu, House, Users, LogOut, LogIn } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { signOut } from "firebase/auth";
 import { auth } from "@/integration/firebase";
 import { Footer } from "@/pages/Footer";
+import { ForgotPassword } from "@/pages/ForgotPassword";
 
 export const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +34,6 @@ export const DashboardLayout = () => {
       sessionStorage.removeItem("user");
       await signOut(auth);
       navigate("/login");
-
     } catch (error) {
       console.error("Error logging out", error);
     }
@@ -53,7 +53,7 @@ export const DashboardLayout = () => {
           </Link>
           {!token && (
             <Button className="bg-teal-600">
-              <Link to="login" className="hover:text-blue-700">
+              <Link to="login" className="hover:bg-teal-700">
                 Login
               </Link>
             </Button>
@@ -93,6 +93,16 @@ export const DashboardLayout = () => {
                   <Link to="about" className="hover:text-blue-700 py-2 flex items-center gap-3">
                     <Users className="h-4" /> About
                   </Link>
+                  {!token && (
+                    <Link to="login" className="hover:text-blue-700 py-2 flex items-center gap-3">
+                       <LogIn  className="h-4"/>Login
+                    </Link>
+                  )}
+                  {token && (
+                    <p className="hover:text-blue-700 py-2 flex items-center gap-3" onClick={handleLogout}>
+                      <LogOut  className="h-4"/>Logout
+                    </p>
+                  )}
                 </div>
               </PopoverContent>
             )}
@@ -101,9 +111,9 @@ export const DashboardLayout = () => {
       </div>
       <div className="mt-14 2xl:mx-64">
         <Outlet />
-        {/* <SignUp/> */}
+        {/* <ForgotPassword/> */}
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

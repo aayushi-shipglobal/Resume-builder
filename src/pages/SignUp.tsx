@@ -2,47 +2,72 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SignUpImage from "@/assets/signup.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import TwitterImage from "@/assets/twitter.png";
+import { useNavigate } from "react-router-dom";
 import Google from "@/assets/google.png";
-import { auth, googleProvider, twitterProvider, facebookProvider } from "@/integration/firebase";
-import {
-  createUserWithEmailAndPassword,
-  getRedirectResult,
-  signInWithPopup,
-  signInWithRedirect,
-  updateProfile,
-} from "firebase/auth";
+import { auth, googleProvider, twitterProvider, githubProvider } from "@/integration/firebase";
+import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import { useState } from "react";
+import { Github } from "lucide-react";
 
 const signInWithGoogle = async (navigate: Function) => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    const token = await user.getIdToken();
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
+      method: "GET",
+    });
+    if (response.status === 404) {
+      const createResponse = await fetch("http://localhost:5000/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firebaseId: user.uid,
+          email: user.email,
+          firstName: user.displayName?.split(" ")[0],
+          lastName: user.displayName?.split(" ")[1],
+          
+        }),
+      });
 
-    navigate("/");
+      if (!createResponse.ok) {
+        alert("Failed to create user in database");
+        return;
+      }
+    }
+
+    navigate("/");  
   } catch (error) {
-    console.error("Error signing in with Google", error);
+    console.error("Error signing in with Google:", error);
   }
 };
 
-const signInWithFacebook = async (navigate: Function) => {
+const signInWithGithub = async (navigate: Function) => {
   try {
-    await signInWithRedirect(auth, facebookProvider);
+    const result = await signInWithPopup(auth, githubProvider);
+    const user = result.user;
+    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
+      method: "GET",
+    });
+    if (response.status === 404) {
+      const createResponse = await fetch("http://localhost:5000/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firebaseId: user.uid,
+          email: user.email,
+          firstName: user.displayName?.split(" ")[0],
+          lastName: user.displayName?.split(" ")[1],
+        }),
+      });
 
-    const result = await getRedirectResult(auth);
-
-    if (result) {
-      const user = result.user;
-      const token = await user.getIdToken();
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/");
-    }
+      if (!createResponse.ok) {
+        alert("Failed to create user in database");
+        return;
+      }
+    } navigate("/");
   } catch (error) {
-    console.error("Error signing in with Facebook", error);
+    console.error("Error signing in with Github", error);
   }
 };
 
@@ -50,34 +75,86 @@ const signInWithTwitter = async (navigate: Function) => {
   try {
     const result = await signInWithPopup(auth, twitterProvider);
     const user = result.user;
-    const token = await user.getIdToken();
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    navigate("/");
+    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
+      method: "GET",
+    });
+    if (response.status === 404) {
+      const createResponse = await fetch("http://localhost:5000/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firebaseId: user.uid,
+          email: user.email,
+          firstName: user.displayName?.split(" ")[0],
+          lastName: user.displayName?.split(" ")[1],
+        }),
+      });
+
+      if (!createResponse.ok) {
+        alert("Failed to create user in database");
+        return;
+      }
+    }navigate("/");
   } catch (error) {
     console.error("Error signing in with Twitter:", error);
   }
 };
+
 const simpleSignUp = async (
   email: string,
   password: string,
   firstName: string,
   lastName: string,
-  navigate: Function,
+  navigate: Function
 ) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(userCredential.user, {
-      displayName: `${firstName} ${lastName}`,
+
+    try {
+      await updateProfile(userCredential.user, {
+        displayName: `${firstName} ${lastName}`,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile.");
+      return;
+    }
+
+    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${userCredential.user.uid}`, {
+      method: "GET",
     });
-    const token = await userCredential.user.getIdToken();
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userCredential.user));
+
+    if (response.status === 404) {
+      const createResponse = await fetch("http://localhost:5000/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firebaseId: userCredential.user.uid,
+          email: userCredential.user.email,
+          firstName: userCredential.user.displayName?.split(" ")[0],
+          lastName: userCredential.user.displayName?.split(" ")[1],
+          password: password,
+        }),
+      });
+
+      if (!createResponse.ok) {
+        alert("Failed to create user in database");
+        return;
+      }
+    }
+
     navigate("/");
-  } catch (error) {
-    console.error("Error signing up with email:", error);
+  } catch (error: any) {
+    if (error.code === "auth/email-already-in-use") {
+      alert("This email is already in use. Please log in or use a different email.");
+      console.log("Email already in use:", error.message);
+    } else {
+      console.error("Error signing up with email:", error);
+      alert("An error occurred while signing up. Please try again.");
+    }
   }
 };
+
 
 export const SignUp = () => {
   const navigate = useNavigate();
@@ -91,6 +168,10 @@ export const SignUp = () => {
     simpleSignUp(email, password, firstName, lastName, navigate);
   };
 
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-center lg:space-y-8 lg:gap-x-20 z-50 mb-4 m-4 md:m-28">
       <div className="flex items-center">
@@ -102,7 +183,7 @@ export const SignUp = () => {
           <div>
             <Label className="text-base">First Name</Label>
             <Input
-              placeholder="Enter your Email"
+              placeholder="Enter your First Name"
               className="my-2 bg-white"
               onChange={(e) => setFirstName(e.target.value)}
             />
@@ -110,7 +191,7 @@ export const SignUp = () => {
           <div>
             <Label className="text-base">Last Name</Label>
             <Input
-              placeholder="Enter your Email"
+              placeholder="Enter your Last Name"
               className="my-2 bg-white"
               onChange={(e) => setLastName(e.target.value)}
             />
@@ -150,30 +231,31 @@ export const SignUp = () => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
         <div className="flex items-center justify-center gap-x-4 mt-2">
+          <Button
+            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black text-white"
+            onClick={() => signInWithGithub(navigate)}
+          >
+            <Github className="fill-white" />
+          </Button>
           <p
             className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-white"
             onClick={() => signInWithGoogle(navigate)}
           >
             <img src={Google} className="w-5 h-5 bg-white fill-white" />
           </p>
-          <Button
-            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-indigo-800 text-white"
-            onClick={() => signInWithFacebook(navigate)}
-          >
-            f
-          </Button>
-          <Button
-            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black text-white"
+
+          <p
+            className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black"
             onClick={() => signInWithTwitter(navigate)}
           >
-            X
-          </Button>
+            <img src={TwitterImage} className="w-5 h-5" />
+          </p>
         </div>
         <p className="mt-4 text-center">
           Already have an account?{" "}
-          <Link to="login" className="text-teal-600 font-medium hover:underline pl-1">
+          <span className="cursor-pointer text-teal-600 font-medium hover:underline pl-1" onClick={handleLogin}>
             Login
-          </Link>
+          </span>
         </p>
       </div>
     </div>

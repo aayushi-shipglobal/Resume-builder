@@ -2,87 +2,72 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LoginImage from "@/assets/login.jpg";
+import TwitterImage from "@/assets/twitter.png";
 import { Link, useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import Google from "@/assets/google.png";
-import { auth, googleProvider, twitterProvider, facebookProvider } from "@/integration/firebase";
-import { getRedirectResult, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect } from "firebase/auth";
+import { auth, googleProvider, twitterProvider, githubProvider } from "@/integration/firebase";
+import { signInWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
 import React from "react";
+import { Github } from "lucide-react";
 
 const signInWithGoogle = async (navigate: Function) => {
-  const storedToken = localStorage.getItem("token");
-  if (storedToken) {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      const token = await user.getIdToken();
-
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("user", JSON.stringify(user));
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing in with Google", error);
-    }
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    await saveUserToDatabase(user);
+    navigate("/");
+  } catch (error) {
+    console.error("Error signing in with Google", error);
   }
 };
 
-const signInWithFacebook = async (navigate: Function) => {
-  const storedToken = localStorage.getItem("token");
-  if (storedToken) {
-    try {
-      await signInWithRedirect(auth, facebookProvider);
+const signInWithGithub = async (navigate: Function) => {
+  try {
+    const result = await signInWithPopup(auth, githubProvider);
 
-      const result = await getRedirectResult(auth);
-
-      if (result) {
-        const user = result.user;
-        const token = await user.getIdToken();
-
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", JSON.stringify(user));
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Error signing in with Facebook", error);
-    }
+    const user = result.user;
+    await saveUserToDatabase(user);navigate("/");
+  } catch (error) {
+    console.error("Error signing in with Github", error);
   }
 };
 
 const signInWithTwitter = async (navigate: Function) => {
-  const storedToken = localStorage.getItem("token");
-  if (storedToken) {
-    try {
-      const result = await signInWithPopup(auth, twitterProvider);
-      const user = result.user;
-      const token = await user.getIdToken();
-
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("user", JSON.stringify(user));
-
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing in with Twitter:", error);
-    }
+  try {
+    const result = await signInWithPopup(auth, twitterProvider);
+    const user = result.user;
+    await saveUserToDatabase(user);
+    navigate("/");
+  } catch (error) {
+    console.error("Error signing in with Twitter:", error);
   }
 };
 
 const handleLogin = async (email: string, password: string, navigate: Function) => {
-  const storedToken = localStorage.getItem("token");
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    await saveUserToDatabase(user);
+    navigate("/");
+  } catch (error) {
+    console.error("Error logging in:", error);
+  }
+};
 
-  if (storedToken) {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const token = await user.getIdToken();
-
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("user", JSON.stringify(user));
-      console.log("here ");
-      navigate("/");
-    } catch (error) {
-      console.error("Error logging in:", error);
-      alert("Invalid email or password. Please try again.");
-    }
+const saveUserToDatabase = async (user: User) => {
+  const response = await fetch("http://localhost:5000/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      firebaseId: user.uid,
+      email: user.email,
+      firstName: user.displayName?.split(" ")[0] || "",
+      lastName: user.displayName?.split(" ")[1] || "",
+    }),
+  });
+  if (!response.ok) {
+    console.error("Failed to save user data");
   }
 };
 
@@ -90,6 +75,10 @@ export const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+
+  const handleSignup = () => {
+    navigate("/signup");
+  };
   return (
     <div className="flex flex-col lg:flex-row justify-center lg:space-y-16 lg:gap-x-20 z-50 m-4 md:m-28">
       <div className="flex items-center">
@@ -137,31 +126,32 @@ export const Login = () => {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
         <div className="flex items-center justify-center gap-x-4 mt-2">
+          <Button
+            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black text-white"
+            onClick={() => signInWithGithub(navigate)}
+          >
+            <Github className="fill-white" />
+          </Button>
           <p
             className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-white"
             onClick={() => signInWithGoogle(navigate)}
           >
             <img src={Google} className="w-5 h-5" />
           </p>
-          <Button
-            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-indigo-800 text-white"
-            onClick={() => signInWithFacebook(navigate)}
-          >
-            f
-          </Button>
-          <Button
-            className="w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black text-white"
+
+          <p
+            className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full border font-bold bg-black"
             onClick={() => signInWithTwitter(navigate)}
           >
-            X
-          </Button>
+            <img src={TwitterImage} className="w-5 h-5" />
+          </p>
         </div>
 
         <p className="mt-4 text-center">
           Don't have an account ?
-          <Link to="login/signup" className="text-teal-600 font-medium hover:underline pl-1">
+          <span className="cursor-pointer text-teal-600 font-medium hover:underline pl-1" onClick={handleSignup}>
             SignUp
-          </Link>
+          </span>
         </p>
       </div>
     </div>

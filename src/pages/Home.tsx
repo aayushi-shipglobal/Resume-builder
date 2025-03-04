@@ -56,7 +56,7 @@ export default function Home() {
       <div>
         <div className="">
           <p className="dark:border-white font-bold text-3xl text-center mt-12 dark:text-white dark:mt-8 md:mt-16 lg:mt-0">
-            Create <span className="text-teal-500">ATS-Optimized</span> Resumes with AI in 3 Easy Steps
+            Create <span className="text-teal-500">ATS-Optimized</span> Resumes in 3 Easy Steps
           </p>
           <p className="mx-28 mt-4">
             We make it easy to create professional, ATS-friendly resumes tailored for platforms like LinkedIn, Naukri,
@@ -113,9 +113,6 @@ export default function Home() {
                               </p>
                             </div>
                           )}
-                          <Button className="bg-teal-500" onClick={handleSelectTemplate}>
-                            <span>{!storedToken ? "Login and Build your Resume" : "Build your Resume"}</span>
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -123,6 +120,7 @@ export default function Home() {
                 ))}
               </CarouselContent>
             </Carousel>
+
             {/* <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
               <button className="carousel-arrow left-0" onClick={() => plugin.current.prev()}>
                 &#8592;
@@ -135,13 +133,18 @@ export default function Home() {
             </div> */}
           </div>
         </div>
+        <div className="flex justify-center mb-24">
+          <Button className="bg-gradient-to-br from-teal-500 to-gray-500 py-6 px-8 text-lg" onClick={handleSelectTemplate}>
+            <span>{!storedToken ? "Login and Build your Resume" : "Build your Resume"}</span>
+          </Button>
+        </div>
       </div>
       <div className="mx-28 grid grid-cols-3 space-x-8 mt-2">
         <img src={AddImage} className="w-60 h-60" />
         <img src={CreateImage} className="w-60 h-60" />
         <img src={SendImage} className="w-60 h-60" />
       </div>
-      <div className="mx-28 grid grid-cols-3 space-x-8 my-8">
+      <div className="mx-28 grid grid-cols-3 space-x-8 mt-8 mb-16">
         <p className="pr-6">
           <div className="font-bold text-2xl">1. Add</div>
           Add your work experience, education, and accomplishments using AI-powered suggestions. Import your resume or
