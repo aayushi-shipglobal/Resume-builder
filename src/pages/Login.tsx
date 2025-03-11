@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LoginImage from "@/assets/login.jpg";
 import TwitterImage from "@/assets/twitter.png";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Checkbox } from "@/components/ui/checkbox";
 import Google from "@/assets/google.png";
 import { auth, googleProvider, twitterProvider, githubProvider } from "@/integration/firebase";
@@ -27,7 +27,8 @@ const signInWithGithub = async (navigate: Function) => {
     const result = await signInWithPopup(auth, githubProvider);
 
     const user = result.user;
-    await saveUserToDatabase(user);navigate("/");
+    await saveUserToDatabase(user);
+    navigate("/");
   } catch (error) {
     console.error("Error signing in with Github", error);
   }
@@ -47,16 +48,31 @@ const signInWithTwitter = async (navigate: Function) => {
 const handleLogin = async (email: string, password: string, navigate: Function) => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    await saveUserToDatabase(user);
-    navigate("/");
-  } catch (error) {
-    console.error("Error logging in:", error);
+    const idToken = await userCredential.user.getIdToken();
+    const response = await fetch("http://localhost:5000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem("token", data.token);
+      navigate("/");
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (error: any) {
+    console.error("Error during login:", error);
+    alert("Login failed: " + error.message);
   }
 };
-
 const saveUserToDatabase = async (user: User) => {
-  const response = await fetch("http://localhost:5000/api/users", {
+  const response = await fetch("http://localhost:5000/api/users/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -111,9 +127,12 @@ export const Login = () => {
               </Label>
             </div>
           </div>
-          <Link to="#" className="text-teal-600 font-semibold hover:underline text-sm">
+          <p
+            className="cursor-pointer text-teal-600 font-semibold hover:underline text-sm"
+            onClick={() => navigate("/forgotpassword")}
+          >
             Forgot Password{" "}
-          </Link>
+          </p>
         </div>
         <div className="flex justify-end">
           <Button className="bg-teal-600 mt-6 w-full" onClick={() => handleLogin(email, password, navigate)}>

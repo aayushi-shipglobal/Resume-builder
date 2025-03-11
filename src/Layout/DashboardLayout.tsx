@@ -12,7 +12,7 @@ import { ForgotPassword } from "@/pages/ForgotPassword";
 export const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const buttonStyle = "h-4 pl-2 dark:text-white";
@@ -30,10 +30,11 @@ export const DashboardLayout = () => {
   };
   const handleLogout = async () => {
     try {
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("user");
+     
       await signOut(auth);
-      navigate("/login");
+      localStorage.removeItem("token");
+      navigate("/");
+      alert("You have been logged out successfully.");
     } catch (error) {
       console.error("Error logging out", error);
     }

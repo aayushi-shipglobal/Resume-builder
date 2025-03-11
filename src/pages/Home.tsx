@@ -21,10 +21,10 @@ const style = "px-3 py-1.5 bg-slate-100 rounded-md mr-1 text-sm font-medium h-8 
 export default function Home() {
   const navigate = useNavigate();
   const plugin = useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
-  const storedToken = sessionStorage.getItem("token");
+  const storedToken = localStorage.getItem("token");
 
   const handleSelectTemplate = () => {
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
     if (token) {
       navigate("/home");

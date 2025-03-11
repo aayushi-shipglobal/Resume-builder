@@ -8,6 +8,7 @@ import Resume3 from "@/pages/Resume3";
 import Resume4 from "@/pages/Resume4";
 import { SignUp } from "@/pages/SignUp";
 import { Login } from "@/pages/Login";
+import { ForgotPassword } from "@/pages/ForgotPassword";
 
 export default function Routes() {
   return {
@@ -25,6 +26,10 @@ export default function Routes() {
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "forgotpassword",
+        element: <ForgotPassword />,
       },
       {
         path: "home",

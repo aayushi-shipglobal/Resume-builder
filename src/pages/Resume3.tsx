@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Skill } from "../reducer/action";
+import html2pdf from "html2pdf.js";
 import { Form } from "@/components/ui/form";
 import { ResumeComponent } from "@/components/elements/ResumeComponent";
 import { PersonalDetailsForm } from "@/components/elements/PersonalDetailsForm";
@@ -15,7 +16,6 @@ import { EducationDetails } from "@/components/elements/EducationDetails";
 import { WorkExperience } from "@/components/elements/WorkExperience";
 import { AwardsAchievements } from "@/components/elements/AwardsAchievements";
 import { TechnicalSkills } from "@/components/elements/TechnicalSkills";
-import jsPDF from "jspdf";
 
 const formSchema = z.object({
   personalDetails: z.object({
@@ -78,6 +78,7 @@ export default function Resume3() {
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
   const [selectedColor, setSelectedColor] = useState(0);
+  const [previewBlob, setPreviewBlob] = useState(null);
 
   const colors = [
     { text: "text-violet-800", border: "border-violet-800", bg: "bg-violet-900" },
@@ -137,7 +138,7 @@ export default function Resume3() {
   });
 
   const { watch } = form;
-  console.log(watch("projects"));
+  
   const summary = watch("personalDetails.summary");
   const phone = watch("personalDetails.phone");
   const projects = watch("projects");
@@ -162,22 +163,61 @@ export default function Resume3() {
     setIsOpen2(!isOpen2);
   };
   const handleDownloadPDF = () => {
-    setTimeout(() => {
-      const doc = new jsPDF();
-      if (resumeRef.current) {
-        doc.html(resumeRef.current, {
-          callback: (doc) => {
-            doc.save("resume.pdf");
-          },
-          x: 15,
-          y: 15,
-          width: 290,
-          windowWidth: 850,
-        });
-      }
-    }, 500);
+    const element = resumeRef.current;
+    if (!element) {
+      console.error("Resume element not found!");
+      return;
+    }
+  
+    element.style.width = "100%"; 
+    element.style.minHeight = "1123px"; 
+    element.style.overflow = "hidden"; 
+  
+    const options = {
+      filename: `${showData.personalDetails.name || "Resume"}.pdf`,
+      margin: 10,
+      html2canvas: {
+        scale: 2,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        windowWidth: 794,
+        windowHeight: 1123,
+        logging: true,
+        letterRendering: true,
+        useCORS: true,
+        onclone: (clonedDoc: any) => {
+          clonedDoc.body.style.width = "794px";
+          clonedDoc.body.style.minHeight = "1123px";
+          clonedDoc.body.style.overflow = "hidden";
+        },
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        putOnlyUsedFonts: true,
+        floatPrecision: 16,
+      },
+    };
+  
+    console.log("Generating PDF from element:", element);
+    html2pdf()
+      .from(element)
+      .set(options)
+      .outputPdf("blob")
+      .then((pdfBlob: Blob) => {
+        console.log("PDF Blob generated, size:", pdfBlob.size, "bytes");
+        if (pdfBlob.size > 0) {
+          setPreviewBlob(pdfBlob);
+        } else {
+          console.error("PDF Blob is empty");
+        }
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+      });
   };
-
+  
   return (
     <div className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
       <div className="rounded-md lg:w-2/5 h-600 overflow-y-auto px-2">
@@ -200,7 +240,7 @@ export default function Resume3() {
           </form>
         </Form>
       </div>
-      <div ref={resumeRef} className="lg:w-3/5">
+      <div ref={resumeRef} id="resume" className="lg:w-3/5">
         <div className=" bg-white text-black rounded-md pb-6 shadow-2xl shadow-black max-h-max">
           <div className={`flex justify-between items-center px-9 py-6 ${currentColor.bg} text-white`}>
             <div>
@@ -351,6 +391,72 @@ export default function Resume3() {
           ))}
         </div>
       </div>
+      {previewBlob && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
+          <div className="relative w-full h-full">
+            <PDFPreview
+              pdfBlob={previewBlob}
+              fileName={`${showData.personalDetails.name || "Resume"}.pdf`}
+              onClose={() => setPreviewBlob(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+interface PDFPreviewProps {
+  pdfBlob: Blob;
+  fileName: string;
+  onClose: () => void;
+}
+
+const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfBlob, fileName, onClose }) => {
+  const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPdfDataUrl(reader.result as string);
+    };
+    reader.readAsDataURL(pdfBlob);
+
+    return () => {
+      setPdfDataUrl(null); 
+    };
+  }, [pdfBlob]);
+
+  const downloadResumeHandler = () => {
+    const link = document.createElement("a");
+    link.href = pdfDataUrl!;
+    link.download = fileName;
+    link.click();
+  };
+
+  return (
+    <div className="fixed inset-0 w-full h-full m-0 p-0 overflow-hidden z-50">
+      <button
+        onClick={downloadResumeHandler}
+        className="fixed top-2 right-12 z-50 px-4 py-2 bg-white border border-gray-900 text-black text-base rounded-md hover:bg-gray-100 mr-10"
+      >
+        Download PDF
+      </button>
+      <button
+        onClick={onClose}
+        className="fixed top-2 right-2 z-50 px-4 py-2 bg-red-500 text-white text-base rounded-md hover:bg-red-600"
+      >
+        Close
+      </button>
+
+      {pdfDataUrl && (
+        <object data={pdfDataUrl} type="application/pdf" className="w-full h-full border-none">
+          <p>
+            Your browser does not support PDF preview. <a href={pdfDataUrl}>Download instead</a>.
+          </p>
+        </object>
+      )}
+    </div>
+  );
+};
+

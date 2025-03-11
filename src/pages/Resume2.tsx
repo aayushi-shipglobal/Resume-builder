@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Skill } from "../reducer/action";
+import html2pdf from "html2pdf.js";
 import { Form } from "@/components/ui/form";
 import { ResumeComponent } from "@/components/elements/ResumeComponent";
 import { PersonalDetailsForm } from "@/components/elements/PersonalDetailsForm";
@@ -72,9 +73,11 @@ const formSchema = z.object({
 
 export default function Resume2() {
   const [isOpen, setIsOpen] = useState(true);
+  const resumeRef = useRef<HTMLDivElement>(null);
   const skills = useSelector((state: any) => state.tasks.tasks);
   const [isOpen1, setIsOpen1] = useState(true);
   const [isOpen2, setIsOpen2] = useState(true);
+  const [previewBlob, setPreviewBlob] = useState(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -146,6 +149,61 @@ export default function Resume2() {
   const handleToggle2 = () => {
     setIsOpen2(!isOpen2);
   };
+  const handleDownloadPDF = () => {
+    const element = resumeRef.current;
+    if (!element) {
+      console.error("Resume element not found!");
+      return;
+    }
+
+    element.style.width = "100%";
+    element.style.minHeight = "1123px";
+    element.style.overflow = "hidden";
+
+    const options = {
+      filename: `${showData.personalDetails.name || "Resume"}.pdf`,
+      margin: 10,
+      html2canvas: {
+        scale: 2,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        windowWidth: 794,
+        windowHeight: 1123,
+        logging: true,
+        letterRendering: true,
+        useCORS: true,
+        onclone: (clonedDoc: any) => {
+          clonedDoc.body.style.width = "794px";
+          clonedDoc.body.style.minHeight = "1123px";
+          clonedDoc.body.style.overflow = "hidden";
+        },
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        putOnlyUsedFonts: true,
+        floatPrecision: 16,
+      },
+    };
+
+    console.log("Generating PDF from element:", element);
+    html2pdf()
+      .from(element)
+      .set(options)
+      .outputPdf("blob")
+      .then((pdfBlob: Blob) => {
+        console.log("PDF Blob generated, size:", pdfBlob.size, "bytes");
+        if (pdfBlob.size > 0) {
+          setPreviewBlob(pdfBlob);
+        } else {
+          console.error("PDF Blob is empty");
+        }
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+      });
+  };
 
   return (
     <div className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
@@ -161,7 +219,7 @@ export default function Resume2() {
               <WorkExperience control={form.control} onClick={handleToggle2} Open2={isOpen2} />
               <AwardsAchievements control={form.control} onClick={handleToggle} Open={isOpen} />
               <div className="flex justify-end">
-                <Button type="submit" className="mt-2 bg-teal-600 text-white">
+                <Button type="submit" className="mt-2 bg-teal-600 text-white" onClick={handleDownloadPDF}>
                   Submit
                 </Button>
               </div>
@@ -169,7 +227,11 @@ export default function Resume2() {
           </form>
         </Form>
       </div>
-      <div className="lg:w-3/5 bg-white text-gray-600 rounded-md py-6 shadow-2xl shadow-black max-h-max">
+      <div
+        ref={resumeRef}
+        id="resume"
+        className="lg:w-3/5 bg-white text-gray-600 rounded-md py-6 shadow-2xl shadow-black max-h-max"
+      >
         <p className="font-bold text-3xl text-center mb-2">
           {showData.personalDetails.name ? showData.personalDetails.name : "Your Name"}
         </p>
@@ -188,7 +250,6 @@ export default function Resume2() {
           <ResumeComponent Icon={Phone} value="+91" title={phone} placeholder="Phone Number" />
         </div>
         <div className="text-center font-normal text-xs my-2 mx-6">{summary ? summary : "Summary"}</div>
-
 
         {isOpen2 && (
           <div className="mb-3 border-t-2 border-gray-600 mx-12 grid grid-cols-12 gap-x-4">
@@ -299,6 +360,71 @@ export default function Resume2() {
           </div>
         )}
       </div>
+      {previewBlob && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
+          <div className="relative w-full h-full">
+            <PDFPreview
+              pdfBlob={previewBlob}
+              fileName={`${showData.personalDetails.name || "Resume"}.pdf`}
+              onClose={() => setPreviewBlob(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+interface PDFPreviewProps {
+  pdfBlob: Blob;
+  fileName: string;
+  onClose: () => void;
+}
+
+const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfBlob, fileName, onClose }) => {
+  const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPdfDataUrl(reader.result as string);
+    };
+    reader.readAsDataURL(pdfBlob);
+
+    return () => {
+      setPdfDataUrl(null);
+    };
+  }, [pdfBlob]);
+
+  const downloadResumeHandler = () => {
+    const link = document.createElement("a");
+    link.href = pdfDataUrl!;
+    link.download = fileName;
+    link.click();
+  };
+
+  return (
+    <div className="fixed inset-0 w-full h-full m-0 p-0 overflow-hidden z-50">
+      <button
+        onClick={downloadResumeHandler}
+        className="fixed top-2 right-12 z-50 px-4 py-2 bg-white border border-gray-900 text-black text-base rounded-md hover:bg-gray-100 mr-10"
+      >
+        Download PDF
+      </button>
+      <button
+        onClick={onClose}
+        className="fixed top-2 right-2 z-50 px-4 py-2 bg-red-500 text-white text-base rounded-md hover:bg-red-600"
+      >
+        Close
+      </button>
+
+      {pdfDataUrl && (
+        <object data={pdfDataUrl} type="application/pdf" className="w-full h-full border-none">
+          <p>
+            Your browser does not support PDF preview. <a href={pdfDataUrl}>Download instead</a>.
+          </p>
+        </object>
+      )}
+    </div>
+  );
+};

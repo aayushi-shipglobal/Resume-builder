@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Skill } from "../reducer/action";
+import html2pdf from "html2pdf.js";
 import { Form } from "@/components/ui/form";
 import { ResumeComponent } from "@/components/elements/ResumeComponent";
 import { PersonalDetailsForm } from "@/components/elements/PersonalDetailsForm";
@@ -15,7 +16,6 @@ import { EducationDetails } from "@/components/elements/EducationDetails";
 import { WorkExperience } from "@/components/elements/WorkExperience";
 import { AwardsAchievements } from "@/components/elements/AwardsAchievements";
 import { TechnicalSkills } from "@/components/elements/TechnicalSkills";
-import { jsPDF } from "jspdf";
 import { useRef } from "react";
 
 const formSchema = z.object({
@@ -91,6 +91,7 @@ export default function Resume4() {
   const [isOpen1, setIsOpen1] = useState(true);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isOpen2, setIsOpen2] = useState(true);
+  const [previewBlob, setPreviewBlob] = useState(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -148,24 +149,6 @@ export default function Resume4() {
   const awardsAchievements = watch("awardsAchievements");
   const showData = form.watch();
 
-  const handleDownloadPDF = () => {
-    setTimeout(() => {
-      const doc = new jsPDF();
-      if (resumeRef.current) {
-        doc.html(resumeRef.current, {
-          callback: (doc) => {
-            doc.save("resume.pdf");
-          },
-          x: 10,
-          y: 10,
-          width: 180, 
-          windowWidth: 650, 
-        });
-      }
-    }, 500); 
-  };
-
-
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
   };
@@ -181,13 +164,67 @@ export default function Resume4() {
   const handleToggle2 = () => {
     setIsOpen2(!isOpen2);
   };
+  const handleDownloadPDF = () => {
+    const element = resumeRef.current;
+    if (!element) {
+      console.error("Resume element not found!");
+      return;
+    }
 
+    element.style.width = "100%";
+    element.style.minHeight = "1123px";
+    element.style.overflow = "hidden";
+
+    const options = {
+      filename: `${showData.personalDetails.name || "Resume"}.pdf`,
+      margin: 10,
+      html2canvas: {
+        scale: 2,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        windowWidth: 794,
+        windowHeight: 1123,
+        logging: true,
+        letterRendering: true,
+        useCORS: true,
+        onclone: (clonedDoc: any) => {
+          clonedDoc.body.style.width = "794px";
+          clonedDoc.body.style.minHeight = "1123px";
+          clonedDoc.body.style.overflow = "hidden";
+        },
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+        putOnlyUsedFonts: true,
+        floatPrecision: 16,
+      },
+    };
+
+    console.log("Generating PDF from element:", element);
+    html2pdf()
+      .from(element)
+      .set(options)
+      .outputPdf("blob")
+      .then((pdfBlob: Blob) => {
+        console.log("PDF Blob generated, size:", pdfBlob.size, "bytes");
+        if (pdfBlob.size > 0) {
+          setPreviewBlob(pdfBlob);
+        } else {
+          console.error("PDF Blob is empty");
+        }
+      })
+      .catch((error) => {
+        console.error("Error generating PDF:", error);
+      });
+  };
   return (
-    <div  className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
+    <div className="m-0 px-8 py-5 dark:bg-gray-900 grid lg:flex lg:flex-row lg:space-x-10 bg-teal-700 max-h-min overflow-clip relative bottom-0">
       <div className="rounded-md lg:w-2/5 h-600 overflow-y-auto px-2">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <PersonalDetailsForm control={form.control} setImagePreview={setImagePreview} value='4'/>
+            <PersonalDetailsForm control={form.control} setImagePreview={setImagePreview} value={4} />
 
             <div className="border border-gray-100 rounded-md p-6 bg-white">
               <TechnicalSkills />
@@ -204,7 +241,7 @@ export default function Resume4() {
           </form>
         </Form>
       </div>
-      <div  ref={resumeRef} className="lg:w-3/5 bg-white text-gray-600 rounded-md  shadow-2xl shadow-black max-h-max">
+      <div ref={resumeRef} className="lg:w-3/5 bg-white text-gray-600 rounded-md  shadow-2xl shadow-black max-h-max">
         <div className="grid grid-cols-5">
           <div className="col-span-2 bg-indigo-200 py-6 px-10 space-y-4 rounded-l-md">
             <div className="items-center justify-center text-gray-500 text-sm mb-2">
@@ -340,6 +377,70 @@ export default function Resume4() {
           </div>
         </div>
       </div>
+      {previewBlob && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
+          <div className="relative w-full h-full">
+            <PDFPreview
+              pdfBlob={previewBlob}
+              fileName={`${showData.personalDetails.name || "Resume"}.pdf`}
+              onClose={() => setPreviewBlob(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+interface PDFPreviewProps {
+  pdfBlob: Blob;
+  fileName: string;
+  onClose: () => void;
+}
+
+const PDFPreview: React.FC<PDFPreviewProps> = ({ pdfBlob, fileName, onClose }) => {
+  const [pdfDataUrl, setPdfDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPdfDataUrl(reader.result as string);
+    };
+    reader.readAsDataURL(pdfBlob);
+
+    return () => {
+      setPdfDataUrl(null);
+    };
+  }, [pdfBlob]);
+
+  const downloadResumeHandler = () => {
+    const link = document.createElement("a");
+    link.href = pdfDataUrl!;
+    link.download = fileName;
+    link.click();
+  };
+
+  return (
+    <div className="fixed inset-0 w-full h-full m-0 p-0 overflow-hidden z-50">
+      <button
+        onClick={downloadResumeHandler}
+        className="fixed top-2 right-12 z-50 px-4 py-2 bg-white border border-gray-900 text-black text-base rounded-md hover:bg-gray-100 mr-10"
+      >
+        Download PDF
+      </button>
+      <button
+        onClick={onClose}
+        className="fixed top-2 right-2 z-50 px-4 py-2 bg-red-500 text-white text-base rounded-md hover:bg-red-600"
+      >
+        Close
+      </button>
+
+      {pdfDataUrl && (
+        <object data={pdfDataUrl} type="application/pdf" className="w-full h-full border-none">
+          <p>
+            Your browser does not support PDF preview. <a href={pdfDataUrl}>Download instead</a>.
+          </p>
+        </object>
+      )}
+    </div>
+  );
+};

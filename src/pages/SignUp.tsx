@@ -6,7 +6,7 @@ import TwitterImage from "@/assets/twitter.png";
 import { useNavigate } from "react-router-dom";
 import Google from "@/assets/google.png";
 import { auth, googleProvider, twitterProvider, githubProvider } from "@/integration/firebase";
-import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import { Github } from "lucide-react";
 
@@ -14,29 +14,24 @@ const signInWithGoogle = async (navigate: Function) => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
-      method: "GET",
-    });
-    if (response.status === 404) {
-      const createResponse = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebaseId: user.uid,
-          email: user.email,
-          firstName: user.displayName?.split(" ")[0],
-          lastName: user.displayName?.split(" ")[1],
-          
-        }),
-      });
 
-      if (!createResponse.ok) {
-        alert("Failed to create user in database");
-        return;
-      }
+    const createResponse = await fetch("http://localhost:5000/api/users/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firebaseId: user.uid,
+        email: user.email,
+        firstName: user.displayName?.split(" ")[0],
+        lastName: user.displayName?.split(" ")[1],
+      }),
+    });
+
+    if (!createResponse.ok) {
+      alert("Failed to create user in database");
+      return;
     }
 
-    navigate("/");  
+    navigate("/");
   } catch (error) {
     console.error("Error signing in with Google:", error);
   }
@@ -46,26 +41,23 @@ const signInWithGithub = async (navigate: Function) => {
   try {
     const result = await signInWithPopup(auth, githubProvider);
     const user = result.user;
-    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
-      method: "GET",
-    });
-    if (response.status === 404) {
-      const createResponse = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebaseId: user.uid,
-          email: user.email,
-          firstName: user.displayName?.split(" ")[0],
-          lastName: user.displayName?.split(" ")[1],
-        }),
-      });
 
-      if (!createResponse.ok) {
-        alert("Failed to create user in database");
-        return;
-      }
-    } navigate("/");
+    const createResponse = await fetch("http://localhost:5000/api/users/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firebaseId: user.uid,
+        email: user.email,
+        firstName: user.displayName?.split(" ")[0],
+        lastName: user.displayName?.split(" ")[1],
+      }),
+    });
+
+    if (!createResponse.ok) {
+      alert("Failed to create user in database");
+      return;
+    }
+    navigate("/");
   } catch (error) {
     console.error("Error signing in with Github", error);
   }
@@ -75,26 +67,23 @@ const signInWithTwitter = async (navigate: Function) => {
   try {
     const result = await signInWithPopup(auth, twitterProvider);
     const user = result.user;
-    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${user.uid}`, {
-      method: "GET",
-    });
-    if (response.status === 404) {
-      const createResponse = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebaseId: user.uid,
-          email: user.email,
-          firstName: user.displayName?.split(" ")[0],
-          lastName: user.displayName?.split(" ")[1],
-        }),
-      });
 
-      if (!createResponse.ok) {
-        alert("Failed to create user in database");
-        return;
-      }
-    }navigate("/");
+    const createResponse = await fetch("http://localhost:5000/api/users/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firebaseId: user.uid,
+        email: user.email,
+        firstName: user.displayName?.split(" ")[0],
+        lastName: user.displayName?.split(" ")[1],
+      }),
+    });
+
+    if (!createResponse.ok) {
+      alert("Failed to create user in database");
+      return;
+    }
+    navigate("/");
   } catch (error) {
     console.error("Error signing in with Twitter:", error);
   }
@@ -105,56 +94,37 @@ const simpleSignUp = async (
   password: string,
   firstName: string,
   lastName: string,
-  navigate: Function
+  navigate: Function,
 ) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-    try {
-      await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${lastName}`,
-      });
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
-      return;
-    }
-
-    const response = await fetch(`http://localhost:5000/api/users?firebaseId=${userCredential.user.uid}`, {
-      method: "GET",
+    const response = await fetch("http://localhost:5000/api/users/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        firstName,
+        lastName,
+      }),
     });
 
-    if (response.status === 404) {
-      const createResponse = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebaseId: userCredential.user.uid,
-          email: userCredential.user.email,
-          firstName: userCredential.user.displayName?.split(" ")[0],
-          lastName: userCredential.user.displayName?.split(" ")[1],
-          password: password,
-        }),
-      });
-
-      if (!createResponse.ok) {
-        alert("Failed to create user in database");
-        return;
+    if (response.ok) {
+      navigate("/");
+    } else {
+      const data = await response.json();
+      if (response.status === 409) {
+        alert(data.message);
+      } else {
+        alert("Error during signup: " + data.message);
       }
     }
-
-    navigate("/");
-  } catch (error: any) {
-    if (error.code === "auth/email-already-in-use") {
-      alert("This email is already in use. Please log in or use a different email.");
-      console.log("Email already in use:", error.message);
-    } else {
-      console.error("Error signing up with email:", error);
-      alert("An error occurred while signing up. Please try again.");
-    }
+  } catch (error) {
+    console.error("Error during signup:", error);
+    alert("An error occurred. Please try again.");
   }
 };
-
 
 export const SignUp = () => {
   const navigate = useNavigate();
